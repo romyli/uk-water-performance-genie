@@ -1,0 +1,20 @@
+# Python environment for the Genie bundle's mutator (python.venv_path: .venv in databricks.yml).
+# The Databricks CLI runs genie_retarget.py from this environment during validate and deploy.
+#
+#   cd bundles/genie && uv sync
+#
+# No data is processed locally; this environment only rewrites names in the Genie definition.
+[project]
+name = "uk-water-performance-genie-bundle"
+version = "1.0.0"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    # Keep at or below the version of the Databricks CLI that deploys the bundle.
+    "databricks-bundles==1.21.0",
+]
+
+[tool.uv]
+package = false

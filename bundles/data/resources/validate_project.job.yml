@@ -1,0 +1,63 @@
+# validate_project: lint, unit/repository tests and integration tests, on serverless compute.
+# Run it after every deployment. Reports go to the validation_reports Volume and ops.test_result.
+resources:
+  jobs:
+    validate_project:
+      name: uk-water-performance-validate
+      description: >-
+        Runs ruff, the deterministic unit and repository tests (generated fixtures, no publisher
+        calls) and integration tests against isolated tables in the test schema.
+      max_concurrent_runs: 1
+      timeout_seconds: 3600
+      tags:
+        project: uk-water-performance
+      email_notifications:
+        on_failure: ${var.notification_emails}
+      environments:
+        - environment_key: validation
+          spec:
+            environment_version: ${var.serverless_environment_version}
+            dependencies:
+              - openpyxl>=3.1,<4
+              - pyyaml>=6,<7
+              - pypdf>=4,<6
+              - pytest>=8,<9
+              - ruff==0.8.6
+      tasks:
+        - task_key: lint
+          description: ruff check and ruff format --check over the whole repository.
+          environment_key: validation
+          spark_python_task:
+            python_file: ../src/tasks/run_validation.py
+            parameters:
+              - lint
+              - --target
+              - &target >-
+                  {"catalog": "${var.catalog}",
+                  "landing_schema": "${resources.schemas.landing.name}",
+                  "ops_schema": "${resources.schemas.ops.name}",
+                  "silver_schema": "${resources.schemas.silver.name}",
+                  "gold_schema": "${resources.schemas.gold.name}",
+                  "test_schema": "${resources.schemas.test.name}",
+                  "raw_volume": "${resources.volumes.raw.name}",
+                  "archive_volume": "${resources.volumes.archive.name}",
+                  "documents_volume": "${resources.volumes.curated_documents.name}",
+                  "reports_volume": "${resources.volumes.validation_reports.name}",
+                  "company_code": "${var.company_code}"}
+              - --run-id
+              - "{{job.run_id}}"
+
+        - task_key: unit_and_repository_tests
+          description: Package, parser, registry, documentation, bundle and Genie-definition tests.
+          environment_key: validation
+          spark_python_task:
+            python_file: ../src/tasks/run_validation.py
+            parameters: [unit, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: integration_tests
+          description: Migrations, idempotent ingestion, Gold grains and gates against the test schema.
+          depends_on: [{task_key: unit_and_repository_tests}]
+          environment_key: validation
+          spark_python_task:
+            python_file: ../src/tasks/run_validation.py
+            parameters: [integration, --target, *target, --run-id, "{{job.run_id}}"]

@@ -1,0 +1,8 @@
+resources:
+  schemas:
+    landing:
+      catalog_name: ${var.catalog}
+      name: ${var.landing_schema}
+      comment: Raw, archive and curated-document Volumes for public source assets.
+      lifecycle:
+        prevent_destroy: true

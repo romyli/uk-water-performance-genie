@@ -1,0 +1,30 @@
+# Test and lint configuration. The validate_project job runs both on Databricks serverless
+# compute; see docs/operations.md. Each bundle owns its own runtime dependencies.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["integration: needs Spark and the deployment's test schema"]
+filterwarnings = [
+    "ignore:.*extension is not supported and will be removed:UserWarning",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["**/.venv", "**/.databricks", "**/dist", "**/build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+ignore = ["SIM108", "B905", "UP038"]
+
+[tool.ruff.lint.per-file-ignores]
+# SQL text: long lines read better than split SQL.
+"bundles/data/src/water_performance/gold_build.py" = ["E501"]
+"bundles/data/src/water_performance/tasks.py" = ["E501"]
+"bundles/data/src/water_performance/parsers.py" = ["E501", "B023"]
+# Row readers define small closures that are called within the same loop iteration.
+"bundles/data/src/water_performance/parsers*.py" = ["B023"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["water_performance", "genie_retarget", "fakes"]

@@ -1,0 +1,128 @@
+# Data bundle: Unity Catalog schemas and Volumes, the refresh_performance job and the
+# validate_project job. Deploy and run this bundle before the Genie bundle (../genie).
+#
+# Supply deployment values with --var or BUNDLE_VAR_<name> environment variables; see
+# ../../config.example.yml. Nothing in this file names a workspace, catalog or person.
+bundle:
+  name: uk-water-performance-data
+
+include:
+  - resources/*.yml
+
+# The validation job tests the whole repository (docs, source register, Genie definition), so the
+# repository root is synchronised, not only this bundle folder.
+sync:
+  paths:
+    - ../..
+
+variables:
+  catalog:
+    description: Existing Unity Catalog catalog that will hold every project schema.
+  landing_schema:
+    description: Schema holding the raw, archive and curated_documents Volumes.
+    default: water_performance_landing
+  ops_schema:
+    description: Schema holding manifests, run logs, rejects, quality results and releases.
+    default: water_performance_ops
+  silver_schema:
+    description: Schema holding source-specific Silver tables and Gold release stores.
+    default: water_performance_silver
+  gold_schema:
+    description: Schema holding the published Gold views and Metric Views. The only schema Genie reads.
+    default: water_performance_gold
+  test_schema:
+    description: Schema used by the validation job's integration tests. Never read by Genie.
+    default: water_performance_test
+  raw_volume:
+    description: Managed Volume for retrieved snapshots and manual-bootstrap uploads.
+    default: raw
+  archive_volume:
+    description: Managed Volume holding immutable, checksum-addressed copies of every source version.
+    default: archive
+  documents_volume:
+    description: Managed Volume of licence-verified documents that Genie may cite.
+    default: curated_documents
+  reports_volume:
+    description: Managed Volume (in the ops schema) for validation reports.
+    default: validation_reports
+  workspace_base:
+    description: Workspace folder that holds this project's bundle files and state.
+  warehouse_name:
+    description: SQL warehouse used by SQL users and the Genie space. Checked by tools/preflight.py.
+  company_code:
+    description: >-
+      Ofwat company code of the deploying company (for example SVE). The only company setting:
+      name, service type and jurisdiction come from the governed company crosswalk.
+  notification_emails:
+    description: Email addresses told when a job fails. A list; may be empty.
+    type: complex
+    default: []
+  refresh_schedule_status:
+    description: PAUSED or UNPAUSED for the refresh_performance schedule. Runs are manual while PAUSED.
+    default: PAUSED
+  refresh_schedule_cron:
+    description: Quartz cron expression for scheduled refreshes (used only when UNPAUSED).
+    default: "0 0 6 ? * MON"
+  serverless_environment_version:
+    description: Serverless environment version for every Python task.
+    default: "4"
+  production_run_as:
+    description: Application ID of the service principal that runs production jobs (prod target).
+    default: ""
+  analyst_group:
+    description: Group that reads Gold and uses the Genie space (prod target).
+    default: ""
+  data_owner_group:
+    description: Group that runs refreshes, uploads manual-bootstrap files and reads operational tables (prod target).
+    default: ""
+
+targets:
+  # A personal development deployment. Resources are prefixed with the target and user, files
+  # live under the user's workspace_base, and schedules stay paused.
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: ${var.workspace_base}/bundles/${bundle.name}/${bundle.target}
+
+  # A customer production deployment, run by a service principal.
+  prod:
+    mode: production
+    workspace:
+      root_path: ${var.workspace_base}/bundles/${bundle.name}/${bundle.target}
+    run_as:
+      service_principal_name: ${var.production_run_as}
+    permissions:
+      - level: CAN_VIEW
+        group_name: ${var.analyst_group}
+      - level: CAN_MANAGE_RUN
+        group_name: ${var.data_owner_group}
+    resources:
+      schemas:
+        gold:
+          grants:
+            - principal: ${var.analyst_group}
+              privileges: [USE_SCHEMA, SELECT]
+            - principal: ${var.data_owner_group}
+              privileges: [USE_SCHEMA, SELECT]
+        ops:
+          grants:
+            - principal: ${var.data_owner_group}
+              privileges: [USE_SCHEMA, SELECT]
+        landing:
+          grants:
+            - principal: ${var.analyst_group}
+              privileges: [USE_SCHEMA]
+            - principal: ${var.data_owner_group}
+              privileges: [USE_SCHEMA]
+      volumes:
+        raw:
+          grants:
+            - principal: ${var.data_owner_group}
+              privileges: [READ_VOLUME, WRITE_VOLUME]
+        curated_documents:
+          grants:
+            - principal: ${var.analyst_group}
+              privileges: [READ_VOLUME]
+            - principal: ${var.data_owner_group}
+              privileges: [READ_VOLUME]

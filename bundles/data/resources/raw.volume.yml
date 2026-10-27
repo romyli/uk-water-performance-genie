@@ -1,0 +1,10 @@
+resources:
+  volumes:
+    raw:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.landing.name}
+      name: ${var.raw_volume}
+      volume_type: MANAGED
+      comment: Retrieved snapshots by run and operator manual-bootstrap uploads. Never attached to Genie.
+      lifecycle:
+        prevent_destroy: true

@@ -1,0 +1,8 @@
+resources:
+  schemas:
+    gold:
+      catalog_name: ${var.catalog}
+      name: ${var.gold_schema}
+      comment: Published Gold views and Metric Views over the current release. The only schema Genie reads.
+      lifecycle:
+        prevent_destroy: true

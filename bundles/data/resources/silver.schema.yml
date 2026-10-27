@@ -1,0 +1,8 @@
+resources:
+  schemas:
+    silver:
+      catalog_name: ${var.catalog}
+      name: ${var.silver_schema}
+      comment: Source-specific Silver tables and versioned Gold release stores.
+      lifecycle:
+        prevent_destroy: true

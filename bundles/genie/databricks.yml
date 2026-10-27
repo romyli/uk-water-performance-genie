@@ -1,0 +1,73 @@
+# Genie bundle: the water company performance Genie space.
+#
+# Deploy it only after the data bundle's refresh_performance job has published a Gold release:
+# Genie checks that every attached object exists. src/water_performance.geniespace.json is
+# written against neutral authoring names; genie_retarget.py rewrites them for the target at
+# validate/deploy time (see genie_table_mapping below).
+bundle:
+  name: uk-water-performance-genie
+
+python:
+  venv_path: .venv
+  mutators:
+    - "genie_retarget:retarget_genie_spaces"
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Catalog that holds the project's Gold schema in this target.
+  gold_schema:
+    description: Gold schema name as configured in the data bundle.
+    default: water_performance_gold
+  landing_schema:
+    description: Landing schema name as configured in the data bundle.
+    default: water_performance_landing
+  documents_volume:
+    description: Curated documents Volume name as configured in the data bundle.
+    default: curated_documents
+  schema_prefix:
+    description: >-
+      Prefix the data bundle's target adds to schema names. Empty for prod; development mode adds
+      dev_<user>_ (set in the dev target below).
+    default: ""
+  workspace_base:
+    description: Workspace folder that holds this project's bundle files, state and the Genie space.
+  warehouse_name:
+    description: SQL warehouse that runs Genie queries. Looked up by name; the ID is never written down.
+  warehouse_id:
+    description: Resolved from warehouse_name at deploy time.
+    lookup:
+      warehouse: ${var.warehouse_name}
+  analyst_group:
+    description: Group allowed to use the Genie space (prod target).
+    default: ""
+  genie_table_mapping:
+    description: >-
+      Rewrite rules from the authoring names in src/*.geniespace.json to this target. Table and
+      view names are the same everywhere, so one schema-level rule and one Volume rule suffice.
+    type: complex
+    default:
+      uk_water_performance_genie.water_performance_gold: ${var.catalog}.${var.schema_prefix}${var.gold_schema}
+      uk_water_performance_genie.water_performance_landing.curated_documents: ${var.catalog}.${var.schema_prefix}${var.landing_schema}.${var.documents_volume}
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: ${var.workspace_base}/bundles/${bundle.name}/${bundle.target}
+    variables:
+      schema_prefix: dev_${workspace.current_user.short_name}_
+
+  prod:
+    mode: production
+    workspace:
+      root_path: ${var.workspace_base}/bundles/${bundle.name}/${bundle.target}
+    resources:
+      genie_spaces:
+        water_performance:
+          permissions:
+            - level: CAN_RUN
+              group_name: ${var.analyst_group}

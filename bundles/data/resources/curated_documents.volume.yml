@@ -1,0 +1,10 @@
+resources:
+  volumes:
+    curated_documents:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.landing.name}
+      name: ${var.documents_volume}
+      volume_type: MANAGED
+      comment: Licence-verified publisher documents that Genie may cite.
+      lifecycle:
+        prevent_destroy: true

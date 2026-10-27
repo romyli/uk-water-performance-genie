@@ -1,0 +1,8 @@
+resources:
+  schemas:
+    ops:
+      catalog_name: ${var.catalog}
+      name: ${var.ops_schema}
+      comment: Manifests, run logs, rejects, quality results and Gold release control.
+      lifecycle:
+        prevent_destroy: true

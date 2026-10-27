@@ -1,0 +1,1005 @@
+{
+  "version": 2,
+  "config": {
+    "sample_questions": [
+      {
+        "id": "10000000000000000000000000000001",
+        "question": [
+          "How are we doing against our performance commitments in 2023-24?"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000002",
+        "question": [
+          "Which performance commitments did we miss in 2024-25?"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000003",
+        "question": [
+          "Where do we rank on water supply interruptions in 2023-24?"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000004",
+        "question": [
+          "What were our net ODI payments by year for 2020-25?"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000005",
+        "question": [
+          "How has our per capita consumption changed since 2017-18?"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000006",
+        "question": [
+          "Where does our 2023-24 C-MeX score come from?"
+        ]
+      }
+    ]
+  },
+  "data_sources": {
+    "tables": [
+      {
+        "identifier": "uk_water_performance_genie.water_performance_gold.deployment_context",
+        "description": [
+          "Exactly one row: the company this deployment answers for. Read it whenever a question says we, us, our, my company, or asks about performance without naming a company."
+        ],
+        "column_configs": [
+          {
+            "column_name": "company_code",
+            "description": [
+              "Ofwat company code of the configured company."
+            ],
+            "synonyms": [
+              "our company code"
+            ]
+          },
+          {
+            "column_name": "interpretation",
+            "description": [
+              "Sentence to state when resolving we/us/our."
+            ]
+          }
+        ]
+      },
+      {
+        "identifier": "uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual",
+        "description": [
+          "Performance commitment levels (targets) and actuals by company, commitment and financial year. price_review PR19 = AMP7 (2020-25), with actual_performance and pcl_met. PR24 = AMP8 (2025-30), levels only. Never combine PR19 and PR24 rows."
+        ],
+        "column_configs": [
+          {
+            "column_name": "actual_performance",
+            "description": [
+              "Reported actual for the year (PR19 only)."
+            ],
+            "synonyms": [
+              "actual",
+              "outturn"
+            ]
+          },
+          {
+            "column_name": "commitment_level",
+            "description": [
+              "The performance commitment level (target) for the year, in unit."
+            ],
+            "synonyms": [
+              "target",
+              "PCL"
+            ]
+          },
+          {
+            "column_name": "company_name",
+            "synonyms": [
+              "company"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "financial_year",
+            "synonyms": [
+              "year"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_configured_company",
+            "description": [
+              "True for the configured company (we/us/our)."
+            ]
+          },
+          {
+            "column_name": "pc_name",
+            "description": [
+              "Performance commitment name."
+            ],
+            "synonyms": [
+              "performance commitment",
+              "PC",
+              "target",
+              "commitment"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "pcl_met",
+            "description": [
+              "Yes or No: whether the level was met (PR19 only)."
+            ],
+            "synonyms": [
+              "met target",
+              "missed"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "price_review",
+            "description": [
+              "PR19 (AMP7, 2020-25) or PR24 (AMP8, 2025-30)."
+            ],
+            "synonyms": [
+              "AMP",
+              "price control period"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "unit",
+            "description": [
+              "Unit of commitment_level and actual_performance. Time-based units are converted to minutes."
+            ]
+          }
+        ]
+      },
+      {
+        "identifier": "uk_water_performance_genie.water_performance_gold.vw_odi_position",
+        "description": [
+          "PR19 outcome delivery incentive payments in GBP million at 2017-18 prices. level = performance_commitment rows are before the aggregate sharing mechanism; level = price_control rows are net after sharing. Never add the two levels together."
+        ],
+        "column_configs": [
+          {
+            "column_name": "company_name",
+            "synonyms": [
+              "company"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_configured_company",
+            "description": [
+              "True for the configured company (we/us/our)."
+            ]
+          },
+          {
+            "column_name": "level",
+            "description": [
+              "performance_commitment or price_control."
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "payment_gbp_m",
+            "description": [
+              "Positive = reward (outperformance), negative = penalty (underperformance). GBP million, 2017-18 prices."
+            ],
+            "synonyms": [
+              "ODI",
+              "reward",
+              "penalty",
+              "payment"
+            ]
+          },
+          {
+            "column_name": "pc_name",
+            "synonyms": [
+              "performance commitment"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "price_control",
+            "description": [
+              "Price control for price_control rows, e.g. Water network plus."
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          }
+        ]
+      },
+      {
+        "identifier": "uk_water_performance_genie.water_performance_gold.vw_provenance",
+        "description": [
+          "Where every Gold number came from: publisher, release, record locator (file/sheet/row or API item/object ID), SHA-256, asset and landing-page URLs, retrieval time and licence. Join on fact_id = observation_id, commitment_id or odi_id."
+        ],
+        "column_configs": [
+          {
+            "column_name": "asset_url",
+            "description": [
+              "Public URL of the asset or API service."
+            ],
+            "synonyms": [
+              "source URL",
+              "download link"
+            ]
+          },
+          {
+            "column_name": "record_locator",
+            "description": [
+              "Exact location of the value in the source asset."
+            ],
+            "synonyms": [
+              "source row",
+              "cell"
+            ]
+          },
+          {
+            "column_name": "sha256",
+            "description": [
+              "Checksum of the archived asset bytes or canonical API records."
+            ],
+            "synonyms": [
+              "checksum",
+              "hash"
+            ]
+          }
+        ]
+      },
+      {
+        "identifier": "uk_water_performance_genie.water_performance_gold.vw_reported_performance",
+        "description": [
+          "One row per published value from Ofwat WCPR open data and Stream APR datasets, with company, financial year, metric definition, unit, price base, comparability and source locator. Use metric_id for mapped measures; use original_label, attribute and rag_reference for any other APR line."
+        ],
+        "column_configs": [
+          {
+            "column_name": "attribute",
+            "description": [
+              "Stream column label, e.g. Statutory, Total appointed activities. A year in brackets means a value for that earlier year, restated in this APR."
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "attribute_financial_year",
+            "description": [
+              "Financial-year end named inside attribute, if any. Prefer rows where it is NULL or equals report_year."
+            ]
+          },
+          {
+            "column_name": "company_name",
+            "synonyms": [
+              "company",
+              "water company"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "financial_year",
+            "description": [
+              "Financial year label, e.g. 2024-25."
+            ],
+            "synonyms": [
+              "year",
+              "FY"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "is_comparable",
+            "description": [
+              "True only when this row may be ranked against other companies."
+            ]
+          },
+          {
+            "column_name": "is_configured_company",
+            "description": [
+              "True for the deployment's configured company (we/us/our)."
+            ],
+            "synonyms": [
+              "us",
+              "our company"
+            ]
+          },
+          {
+            "column_name": "is_preferred_source",
+            "description": [
+              "True for the value to use when two sources report the same metric, company and year."
+            ]
+          },
+          {
+            "column_name": "metric_name",
+            "description": [
+              "Canonical metric name. NULL when the published line has no approved mapping."
+            ],
+            "synonyms": [
+              "measure",
+              "KPI"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "original_label",
+            "description": [
+              "Line or item description exactly as published."
+            ],
+            "synonyms": [
+              "line",
+              "APR line",
+              "description"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "price_base",
+            "description": [
+              "Price base of money values, e.g. nominal (outturn); not_applicable for non-money measures."
+            ]
+          },
+          {
+            "column_name": "report_year",
+            "description": [
+              "Financial-year end: 2024-25 is 2025."
+            ]
+          },
+          {
+            "column_name": "reporting_area",
+            "description": [
+              "whole_company, or a region. Only whole_company rows are compared."
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "theme",
+            "synonyms": [
+              "topic",
+              "area"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "unit",
+            "synonyms": [
+              "units"
+            ]
+          },
+          {
+            "column_name": "value",
+            "description": [
+              "The published value in unit."
+            ]
+          }
+        ]
+      },
+      {
+        "identifier": "uk_water_performance_genie.water_performance_gold.vw_source_coverage",
+        "description": [
+          "Every registered public source, its status (enabled, conditional, hold), whether it is available in the published release, why not, and the years and companies it covers. Query it before saying data is not available."
+        ],
+        "column_configs": [
+          {
+            "column_name": "hold_reason",
+            "description": [
+              "Why the source is not available."
+            ]
+          },
+          {
+            "column_name": "jurisdiction",
+            "description": [
+              "england_wales, england, wales, scotland or northern_ireland."
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "status",
+            "description": [
+              "enabled, conditional or hold."
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          },
+          {
+            "column_name": "title",
+            "synonyms": [
+              "source",
+              "dataset"
+            ],
+            "enable_entity_matching": true,
+            "enable_format_assistance": true
+          }
+        ]
+      }
+    ],
+    "metric_views": [
+      {
+        "identifier": "uk_water_performance_genie.water_performance_gold.mv_peer_comparison",
+        "description": [
+          "Governed peer measures over comparable whole-company values: company_value, peer_median, best_rank, companies_compared, lowest_value, highest_value. Always filter to one metric_id and one financial_year. Query measures with MEASURE()."
+        ]
+      }
+    ],
+    "volumes": [
+      {
+        "path": "/Volumes/uk_water_performance_genie/water_performance_landing/curated_documents",
+        "description": [
+          "Licence-verified publisher documents for definitions and citations only, never for numbers: ofwat/rag/ holds Ofwat's RAG 4 guideline for the APR table definitions (cite the file name and page)."
+        ]
+      }
+    ]
+  },
+  "instructions": {
+    "text_instructions": [
+      {
+        "id": "30000000000000000000000000000001",
+        "content": [
+          "ROLE. You answer questions about the published regulatory performance of England and Wales water companies for analysts at one water company. Use only the attached Gold objects. Every number must come from a query result; never estimate, impute, average across unlike metrics or invent a figure. State the unit of every number and the price base of every money value.\n",
+          "COMPANY SCOPE. deployment_context has exactly one row: the configured company. When a question says we, us, our, my company, or asks about performance without naming a company, filter to that company (is_configured_company = true, or join deployment_context on company_code) and start the answer with the sentence in deployment_context.interpretation When the user names a company, use that company instead and do not add the configured company unless asked. Match company names with dim values in company_name; codes such as SVE or UUW are company_code.\n",
+          "PERIODS. report_year is the year a financial year ends: 2024-25 = 2025, also written FY25 or 2024/25. If a user gives a bare year such as 2024, use the financial year ending in that year (2023-24), say so, and offer the other reading. PR19 covers AMP7, financial years 2020-21 to 2024-25. PR24 covers AMP8, 2025-26 to 2029-30. Keep PR19 and PR24 definitions separate even when names look alike: never put a PR19 actual next to a PR24 level as if they measured the same thing.\n",
+          "COMPARISONS AND RANKS. Rank or compare companies only with vw_peer_comparison or mv_peer_comparison, which contain only rows where is_comparable is true (same definition, unit, period basis, service type and price base, whole-company scope, preferred source). rank_in_peer_group 1 is best for the metric's direction. Wastewater metrics compare water and sewerage companies only. If asked to rank a metric that is not comparable, do not rank it: quote comparability_reason from vw_reported_performance and suggest the comparable alternative it names.\n",
+          "METRIC VIEW. mv_peer_comparison is a metric view. Select its measures with MEASURE(), for example SELECT company_name, MEASURE(company_value), MEASURE(peer_median) FROM ...mv_peer_comparison WHERE metric_id = 'cmex_score' AND financial_year = '2023-24' GROUP BY ALL. Never put a measure in WHERE or GROUP BY.\n",
+          "WHICH OBJECT. Reported values and trends: vw_reported_performance (use metric_id where one exists and is_preferred_source = true for one value per company, metric and year; otherwise filter original_label, attribute and rag_reference). Targets, actuals and whether a target was met: vw_commitment_vs_actual. Rewards and penalties: vw_odi_position, GBP million at 2017-18 prices; sum price_control rows for net totals and never add performance_commitment rows to them. Finance lines come from Stream APR table 1 (statutory accounts, nominal prices) and are not available for every company or year. Stream attributes that name an earlier year in brackets are prior-year values restated in a later report; prefer rows where attribute_financial_year is NULL or equals report_year.\n",
+          "MISSING DATA. Before saying data is missing, query vw_source_coverage. If the source is on hold or not available in the release, say the data is 'not available in the public sources held', give the reason from hold_reason, and give no number. Environment Agency (EPA, storm overflows), Drinking Water Inspectorate and CCW complaint data are on hold. Scotland and Northern Ireland are not covered: never use England and Wales data to answer for them.\n",
+          "SOURCES. Prefer structured Gold values for every number. End each numeric answer with a short citation: source, release and record locator (from the row or vw_provenance). When asked where a number came from, query vw_provenance and give the publisher, release, record locator, SHA-256, asset URL, landing page and licence. Documents in the curated documents Volume are for definitions only: cite the file name and page; never take numbers from them.\n",
+          "METRIC IDS. Filter on metric_id whenever the question matches one of these, and then do not also match labels with LIKE (other published lines share the same words): water_quality_cri = Water quality compliance (CRI) (CRI score, comparable); water_supply_interruptions = Water supply interruptions (minutes per property, comparable); leakage_reduction_pct = Leakage reduction from the 2019-20 baseline (percent, comparable); pcc_reduction_pct = Per capita consumption reduction from the 2019-20 baseline (percent, comparable); mains_repairs = Mains repairs (repairs per 1,000 km, comparable); unplanned_outage = Unplanned outage (percent of peak week production capacity, comparable); drought_restriction_risk = Risk of severe restrictions in a drought (percent of population, comparable); internal_sewer_flooding = Internal sewer flooding (incidents per 10,000 connections, comparable); pollution_incidents = Pollution incidents (incidents per 10,000 km of sewer, comparable); sewer_collapses = Sewer collapses (collapses per 1,000 km of sewer, comparable); treatment_works_compliance = Treatment works compliance (percent, comparable); sewer_flooding_storm_risk = Risk of sewer flooding in a storm (percent of population, comparable); cmex_score = C-MeX score (score, comparable); per_capita_consumption = Per capita consumption (litres per person per day, comparable); leakage_ml_per_day = Leakage (annual average) (Ml/d, not comparable); connected_properties_water = Properties connected for water supply (thousand properties, not comparable); revenue_statutory = Revenue (statutory) (GBP million, not comparable); operating_costs_statutory = Operating costs (statutory) (GBP million, not comparable); operating_profit_statutory = Operating profit (statutory) (GBP million, not comparable); profit_before_tax_statutory = Profit before tax (statutory) (GBP million, not comparable); dividends_statutory = Dividends (statutory) (GBP million, not comparable); borrowings_non_current_statutory = Borrowings due after one year (statutory) (GBP million, not comparable). Use original_label, attribute and rag_reference only for lines without a metric_id.\n",
+          "DATA HELD. For questions about data or places the project may not cover, query vw_source_coverage by source_id and select status, available_in_release and hold_reason: complaints = CCW_COMPLAINTS; EPA ratings and pollution performance assessments = EA_EPA; storm overflows and spills = EA_EDM; drinking water samples, failures and events = DWI_COMPANY; service areas and postcodes = COMPANY_BOUNDARIES; company APR workbooks = COMPANY_APR; Scotland or Scottish Water = WICS_RETURN (or jurisdiction = 'scotland'); Northern Ireland = NI_AIR. If available_in_release is false, answer that the data is not available in the public sources held, give hold_reason, and give no number.\n",
+          "NOT COMPARABLE. When asked to rank or compare companies on a metric whose is_comparable is false, run SELECT DISTINCT metric_name, comparability_reason FROM vw_reported_performance WHERE metric_id = '<metric_id>', do not rank, quote the reason and offer the comparable metric it names.\n",
+          "PROVENANCE QUERIES. For 'where does this number come from', select from vw_provenance joined to deployment_context (or the named company) and filter fact_type, metric_id and financial_year exactly, returning one row with publisher, release_label, record_locator, sha256, asset_url, landing_page and licence_id.\n"
+        ]
+      }
+    ],
+    "example_question_sqls": [
+      {
+        "id": "20000000000000000000000000000001",
+        "question": [
+          "How are we doing against our 2023-24 performance commitments?"
+        ],
+        "sql": [
+          "SELECT d.interpretation, v.pc_name, v.commitment_level, v.actual_performance, v.unit, v.pcl_met FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual v CROSS JOIN uk_water_performance_genie.water_performance_gold.deployment_context d WHERE v.is_configured_company AND v.price_review = 'PR19' AND v.financial_year = '2023-24' ORDER BY v.pcl_met, v.pc_name"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000002",
+        "question": [
+          "Rank companies on pollution incidents in 2023-24."
+        ],
+        "sql": [
+          "SELECT company_name, value, unit, rank_in_peer_group, companies_in_peer_group FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison WHERE metric_id = 'pollution_incidents' AND financial_year = '2023-24' ORDER BY rank_in_peer_group"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000003",
+        "question": [
+          "How does our per capita consumption compare with the median each year?"
+        ],
+        "sql": [
+          "SELECT financial_year, MEASURE(company_value) AS our_value, MEASURE(peer_median) AS all_company_median FROM uk_water_performance_genie.water_performance_gold.mv_peer_comparison WHERE metric_id = 'per_capita_consumption' AND is_configured_company GROUP BY ALL ORDER BY financial_year"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000004",
+        "question": [
+          "What were our net ODI payments in 2023-24 by price control?"
+        ],
+        "sql": [
+          "SELECT price_control, payment_gbp_m, price_base, sharing_basis FROM uk_water_performance_genie.water_performance_gold.vw_odi_position WHERE is_configured_company AND level = 'price_control' AND financial_year = '2023-24' ORDER BY payment_gbp_m"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000005",
+        "question": [
+          "Show Yorkshire Water's revenue and dividends over time."
+        ],
+        "sql": [
+          "SELECT financial_year, metric_name, value, unit, price_base FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance WHERE company_code = 'YKY' AND metric_id IN ('revenue_statutory', 'dividends_statutory') ORDER BY report_year, metric_name"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000006",
+        "question": [
+          "Where does our 2023-24 C-MeX score come from?"
+        ],
+        "sql": [
+          "SELECT p.publisher, p.release_label, p.record_locator, p.sha256, p.asset_url, p.landing_page, p.licence_id FROM uk_water_performance_genie.water_performance_gold.vw_provenance p JOIN uk_water_performance_genie.water_performance_gold.deployment_context d ON d.company_code = p.company_code WHERE p.metric_id = 'cmex_score' AND p.financial_year = '2023-24'"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000007",
+        "question": [
+          "Do you have storm overflow spill data?"
+        ],
+        "sql": [
+          "SELECT source_id, title, status, available_in_release, hold_reason FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage WHERE source_id IN ('EA_EDM', 'EA_EPA')"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000008",
+        "question": [
+          "Show the APR revenue line for Wessex Water in 2024-25 across all attributes."
+        ],
+        "sql": [
+          "SELECT attribute, value, unit FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance WHERE company_code = 'WSX' AND financial_year = '2024-25' AND rag_reference = '1A.1' AND attribute_financial_year IS NULL ORDER BY attribute"
+        ]
+      }
+    ],
+    "join_specs": [
+      {
+        "id": "40000000000000000000000000000001",
+        "left": {
+          "identifier": "uk_water_performance_genie.water_performance_gold.vw_reported_performance",
+          "alias": "vw_reported_performance"
+        },
+        "right": {
+          "identifier": "uk_water_performance_genie.water_performance_gold.vw_provenance",
+          "alias": "vw_provenance"
+        },
+        "sql": [
+          "`vw_reported_performance`.`observation_id` = `vw_provenance`.`fact_id`",
+          "--rt=FROM_RELATIONSHIP_TYPE_ONE_TO_ONE--"
+        ]
+      },
+      {
+        "id": "40000000000000000000000000000002",
+        "left": {
+          "identifier": "uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual",
+          "alias": "vw_commitment_vs_actual"
+        },
+        "right": {
+          "identifier": "uk_water_performance_genie.water_performance_gold.vw_provenance",
+          "alias": "vw_provenance"
+        },
+        "sql": [
+          "`vw_commitment_vs_actual`.`commitment_id` = `vw_provenance`.`fact_id`",
+          "--rt=FROM_RELATIONSHIP_TYPE_ONE_TO_ONE--"
+        ]
+      }
+    ],
+    "sql_snippets": {
+      "filters": [
+        {
+          "id": "50000000000000000000000000000001",
+          "display_name": "Our company",
+          "sql": [
+            "vw_reported_performance.is_configured_company"
+          ],
+          "synonyms": [
+            "we",
+            "us",
+            "our",
+            "my company"
+          ]
+        },
+        {
+          "id": "50000000000000000000000000000002",
+          "display_name": "Comparable values only",
+          "sql": [
+            "vw_reported_performance.is_comparable AND vw_reported_performance.is_preferred_source"
+          ],
+          "synonyms": [
+            "like for like",
+            "comparable"
+          ]
+        }
+      ]
+    }
+  },
+  "benchmarks": {
+    "questions": [
+      {
+        "id": "60000000000000000000000000000001",
+        "question": [
+          "Which of our PR19 performance commitments did we meet in 2023-24?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT pc_name, commitment_level, actual_performance, unit, pcl_met\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual\n",
+              "WHERE is_configured_company AND price_review = 'PR19' AND financial_year = '2023-24' AND pcl_met = 'Yes'\n",
+              "ORDER BY pc_name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000002",
+        "question": [
+          "Which performance commitments did we miss in 2024-25?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT pc_name, commitment_level, actual_performance, unit\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual\n",
+              "WHERE is_configured_company AND price_review = 'PR19' AND financial_year = '2024-25' AND pcl_met = 'No'\n",
+              "ORDER BY pc_name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000003",
+        "question": [
+          "How has our per capita consumption changed since 2017-18?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT financial_year, value, unit\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance\n",
+              "WHERE is_configured_company AND metric_id = 'per_capita_consumption' AND is_preferred_source\n",
+              "  AND reporting_area = 'whole_company' AND report_year >= 2018\n",
+              "ORDER BY report_year"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000004",
+        "question": [
+          "What was our water supply interruptions target and actual performance each year of 2020-25?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT financial_year, commitment_level, actual_performance, unit, pcl_met\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual\n",
+              "WHERE is_configured_company AND price_review = 'PR19' AND lower(pc_name) = 'water supply interruptions'\n",
+              "ORDER BY report_year"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000005",
+        "question": [
+          "What were our net ODI payments by year for 2020-25, after aggregate sharing?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT financial_year, round(sum(payment_gbp_m), 3) AS net_odi_payment_gbp_m\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_odi_position\n",
+              "WHERE is_configured_company AND level = 'price_control'\n",
+              "GROUP BY financial_year ORDER BY financial_year"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000006",
+        "question": [
+          "Which three performance commitments cost us the most in ODI penalties over 2020-25?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT pc_name, round(sum(payment_gbp_m), 3) AS total_payment_gbp_m\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_odi_position\n",
+              "WHERE is_configured_company AND level = 'performance_commitment'\n",
+              "GROUP BY pc_name ORDER BY total_payment_gbp_m ASC LIMIT 3"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000007",
+        "question": [
+          "Show United Utilities' statutory revenue and operating costs for each year held."
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT financial_year, metric_id, value\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance\n",
+              "WHERE company_code = 'UUW' AND metric_id IN ('revenue_statutory', 'operating_costs_statutory')\n",
+              "ORDER BY financial_year, metric_id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000008",
+        "question": [
+          "Rank companies on water supply interruptions in 2023-24."
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT company_name, value, unit, rank_in_peer_group\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison\n",
+              "WHERE metric_id = 'water_supply_interruptions' AND financial_year = '2023-24'\n",
+              "ORDER BY rank_in_peer_group, company_name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000009",
+        "question": [
+          "Where do we rank on internal sewer flooding in 2023-24, and how many companies are compared?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT rank_in_peer_group, companies_in_peer_group\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison\n",
+              "WHERE metric_id = 'internal_sewer_flooding' AND financial_year = '2023-24' AND is_configured_company"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000010",
+        "question": [
+          "What was our C-MeX score in 2023-24 compared with the median of all companies?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT value AS company_score, peer_median\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison\n",
+              "WHERE metric_id = 'cmex_score' AND financial_year = '2023-24' AND is_configured_company"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000011",
+        "question": [
+          "What was our C-MeX score each year?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT financial_year, value\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance\n",
+              "WHERE is_configured_company AND metric_id = 'cmex_score' AND is_preferred_source\n",
+              "ORDER BY report_year"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000012",
+        "question": [
+          "How many pollution incidents per 10,000 km of sewer did we have in each year of AMP7?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT financial_year, value\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance\n",
+              "WHERE is_configured_company AND metric_id = 'pollution_incidents' AND amp = 'AMP7' AND is_preferred_source\n",
+              "ORDER BY financial_year"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000013",
+        "question": [
+          "What was our water quality compliance (CRI) score in 2023-24?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT company_name, financial_year, value\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance\n",
+              "WHERE is_configured_company AND metric_id = 'water_quality_cri' AND financial_year = '2023-24'\n",
+              "  AND is_preferred_source"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000014",
+        "question": [
+          "What was our leakage reduction in 2024?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT financial_year, value, unit\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance\n",
+              "WHERE is_configured_company AND metric_id = 'leakage_reduction_pct' AND report_year = 2024\n",
+              "  AND is_preferred_source"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000015",
+        "question": [
+          "Compare Severn Trent Water and United Utilities on mains repairs in 2023-24."
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT company_name, value, unit, rank_in_peer_group\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison\n",
+              "WHERE metric_id = 'mains_repairs' AND financial_year = '2023-24' AND company_code IN ('SVE', 'UUW')\n",
+              "ORDER BY company_name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000016",
+        "question": [
+          "How many complaints per 10,000 connections did we receive last year?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT status, available_in_release, hold_reason\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage\n",
+              "WHERE source_id = 'CCW_COMPLAINTS'"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000017",
+        "question": [
+          "What is our Environment Agency EPA star rating?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT status, available_in_release, hold_reason\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage\n",
+              "WHERE source_id = 'EA_EPA'"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000018",
+        "question": [
+          "How many drinking water sample failures did we have in 2024?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT status, available_in_release, hold_reason\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage\n",
+              "WHERE source_id = 'DWI_COMPANY'"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000019",
+        "question": [
+          "Rank all companies by total leakage in megalitres per day for 2023-24."
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT DISTINCT comparability_reason\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance\n",
+              "WHERE metric_id = 'leakage_ml_per_day'"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000020",
+        "question": [
+          "How does Scottish Water's leakage compare with ours?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT status, available_in_release, hold_reason\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage\n",
+              "WHERE jurisdiction = 'scotland'"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000021",
+        "question": [
+          "Where does our 2023-24 per capita consumption figure come from?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT p.release_label, p.record_locator, p.sha256, p.asset_url, p.licence_id\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_provenance p\n",
+              "JOIN uk_water_performance_genie.water_performance_gold.deployment_context d ON d.company_code = p.company_code\n",
+              "WHERE p.fact_type = 'reported_performance' AND p.metric_id = 'per_capita_consumption'\n",
+              "  AND p.financial_year = '2023-24'"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000022",
+        "question": [
+          "What are our PR24 performance commitment levels for leakage in 2025-30?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT financial_year, pc_name, commitment_level, unit\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual\n",
+              "WHERE is_configured_company AND price_review = 'PR24' AND lower(pc_name) LIKE '%leakage%'\n",
+              "ORDER BY report_year"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000023",
+        "question": [
+          "Which company had the lowest per capita consumption in 2023-24?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT company_name, value, unit\n",
+              "FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison\n",
+              "WHERE metric_id = 'per_capita_consumption' AND financial_year = '2023-24' AND rank_in_peer_group = 1"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60000000000000000000000000000024",
+        "question": [
+          "Which company is this space configured for?"
+        ],
+        "answer": [
+          {
+            "format": "SQL",
+            "content": [
+              "SELECT company_code, company_name, service_type, jurisdiction\n",
+              "FROM uk_water_performance_genie.water_performance_gold.deployment_context"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

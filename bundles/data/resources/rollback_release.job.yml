@@ -1,0 +1,46 @@
+# rollback_release: point every Gold view back at an earlier published release. Run it with
+#   databricks bundle run rollback_release -t <target> --params release_id=<release id>
+# Release IDs are listed in ops.release (status published or superseded).
+resources:
+  jobs:
+    rollback_release:
+      name: uk-water-performance-rollback
+      description: Switches the published Gold release to an earlier release that is still retained.
+      max_concurrent_runs: 1
+      tags:
+        project: uk-water-performance
+      email_notifications:
+        on_failure: ${var.notification_emails}
+      parameters:
+        - name: release_id
+          default: ""
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: ${var.serverless_environment_version}
+            dependencies:
+              - pyyaml>=6,<7
+      tasks:
+        - task_key: rollback
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters:
+              - rollback
+              - --release-id
+              - "{{job.parameters.release_id}}"
+              - --target
+              - >-
+                  {"catalog": "${var.catalog}",
+                  "landing_schema": "${resources.schemas.landing.name}",
+                  "ops_schema": "${resources.schemas.ops.name}",
+                  "silver_schema": "${resources.schemas.silver.name}",
+                  "gold_schema": "${resources.schemas.gold.name}",
+                  "test_schema": "${resources.schemas.test.name}",
+                  "raw_volume": "${resources.volumes.raw.name}",
+                  "archive_volume": "${resources.volumes.archive.name}",
+                  "documents_volume": "${resources.volumes.curated_documents.name}",
+                  "reports_volume": "${resources.volumes.validation_reports.name}",
+                  "company_code": "${var.company_code}"}
+              - --run-id
+              - "{{job.run_id}}"

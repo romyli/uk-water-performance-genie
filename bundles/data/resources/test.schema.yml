@@ -1,0 +1,8 @@
+resources:
+  schemas:
+    test:
+      catalog_name: ${var.catalog}
+      name: ${var.test_schema}
+      comment: Isolated tables created and dropped by the validation job's integration tests.
+      lifecycle:
+        prevent_destroy: true

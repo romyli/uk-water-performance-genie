@@ -1,0 +1,21 @@
+resources:
+  genie_spaces:
+    water_performance:
+      title: Water company performance (England and Wales)
+      warehouse_id: ${var.warehouse_id}
+      parent_path: ${workspace.root_path}
+      # Retargeted for this target by genie_retarget.py, which returns the space inline.
+      file_path: ../src/water_performance.geniespace.json
+      description: |-
+        Ask about one England and Wales water company's published regulatory performance and how it
+        compares with other companies, using public regulator and company data only.
+
+        - "We", "us" and "our" mean the company this deployment is configured for (see deployment_context).
+          Name another company to ask about it instead.
+        - Financial years: 2024-25 is report year 2025. AMP7 (PR19) is 2020-25; AMP8 (PR24) is 2025-30.
+        - Companies are ranked only on measures marked comparable for the same definition, unit, period,
+          service type and price base.
+        - Every number can be traced to its publisher, release, file or API record, checksum and licence.
+
+        Not covered: Scotland, Northern Ireland, environmental (EA), drinking-water (DWI) and complaint (CCW)
+        data, and anything not in the public sources held.

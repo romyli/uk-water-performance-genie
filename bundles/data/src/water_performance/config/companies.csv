@@ -1,0 +1,18 @@
+company_code,company_name,service_type,jurisdiction,first_report_year,last_report_year,aliases,notes
+AFW,Affinity Water,water_only,england_wales,,,Affinity|Affinity Water Ltd,
+ANH,Anglian Water,water_and_sewerage,england_wales,,,Anglian|Anglian Water Services,
+BRL,Bristol Water,water_only,england_wales,,,Bristol|Bristol Water plc,Reported separately before joining South West Water; later Bristol-area data is reported under SWB.
+HDD,Hafren Dyfrdwy,water_and_sewerage,england_wales,,,Hafren Dyfrdwy Cyfyngedig|Dee Valley Water,
+NES,Northumbrian Water,water_and_sewerage,england_wales,,,Northumbrian|Northumbrian Water Limited|Essex and Suffolk Water,Includes Essex and Suffolk Water.
+PRT,Portsmouth Water,water_only,england_wales,,,Portsmouth,
+SES,SES Water,water_only,england_wales,,,Sutton and East Surrey Water,
+SEW,South East Water,water_only,england_wales,,,South East,
+SRN,Southern Water,water_and_sewerage,england_wales,,,Southern,
+SSC,South Staffs Water,water_only,england_wales,,,South Staffordshire Water|South Staffs|Cambridge Water,Includes Cambridge Water.
+SVE,Severn Trent Water,water_and_sewerage,england_wales,,,Severn Trent|STW,
+SWB,South West Water,water_and_sewerage,england_wales,,,South West|SWW|South West Water Limited,Includes the Bristol area after the Bristol Water merger.
+TMS,Thames Water,water_and_sewerage,england_wales,,,Thames|TWUL|Thames Water Utilities,
+UUW,United Utilities,water_and_sewerage,england_wales,,,United Utilities Water|UU,
+WSH,Dŵr Cymru Welsh Water,water_and_sewerage,england_wales,,,Dwr Cymru|Dŵr Cymru|Welsh Water|DCWW,
+WSX,Wessex Water,water_and_sewerage,england_wales,,,Wessex,
+YKY,Yorkshire Water,water_and_sewerage,england_wales,,,Yorkshire|Yorkshire Water Services,

@@ -1,0 +1,524 @@
+# Stream APR items registered for ingestion. Each item is one company's APR dataset for one financial year.
+# The licence is re-checked from the item's metadata on every retrieval; registration alone does not enable an item.
+# reporting_area: whole_company items are the only ones eligible for peer comparison. South West Water also
+# publishes its South West and Bristol areas separately.
+# source_company_code is the code used inside the data, which can differ from the canonical company code.
+# Discovery (task discover_sources) lists any new public Stream APR item that is not registered here.
+contract_version: 1
+items:
+  - item_id: 7a3b5a4b92be469d9584a9a5feef2dd1
+    title: "Affinity Water Annual Performance report 2023-24"
+    company_code: AFW
+    source_company_code: AFW
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Affinity_Water_APR_Datatable_2023_2024/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 697b3b4f620746dd9ae89530fd2f31d2
+    title: "Affinity Water Annual Performance Report (APR) 2024-25"
+    company_code: AFW
+    source_company_code: AFW
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/AFW_Annual_Performance_Report_2024_25/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: c1bb15b8cd1841e4bb7c2bdc68489f05
+    title: "Affinity Water Annual Performance Report (APR) 2025-26"
+    company_code: AFW
+    source_company_code: AFW
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Affinity_Water_Annual_Performance_Report_(APR)_2025-26/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 2de34582f9294c8daa900f2a73d61e83
+    title: "Anglian Water Annual Performance Report 23 24"
+    company_code: ANH
+    source_company_code: ANH
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Anglian_Water_Annual_Performance_Report_2023_24/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 4fa5f2afee804a5788fcb126d4a72937
+    title: "Anglian Water Annual Performance Report 24 25"
+    company_code: ANH
+    source_company_code: ANH
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Anglian_Water_Annual_Performance_Report_24_25/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 3f0211d579f04504ac70aacf9d781e30
+    title: "Anglian Water Annual Performance Report 2025-2026"
+    company_code: ANH
+    source_company_code: ANH
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/14_07_2026_1808/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: ff2a7a9ad66846f891703c9fc39e8a4d
+    title: "South West Water (Bristol Water) Annual Performance report 2024"
+    company_code: SWB
+    source_company_code: BRL
+    financial_year: "2023-24"
+    reporting_area: bristol_area
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(Bristol_Water)_Annual_Performance_report_2024/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 72273ef06ace43f78c874187c4b559be
+    title: "South West Water (Bristol Area) Annual Performance Report (APR) 2024-2025"
+    company_code: SWB
+    source_company_code: BRL
+    financial_year: "2024-25"
+    reporting_area: bristol_area
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(Bristol_Area)_Annual_Performance_Report_(APR)_2024_2025/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 5561ebca9889457488774581e1d92465
+    title: "South West Water (Bristol) Annual Performance Report 2025-2026"
+    company_code: SWB
+    source_company_code: BRL
+    financial_year: "2025-26"
+    reporting_area: bristol_area
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(Bristol_Water)_Annual_Performance_Report_2025-2026/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 5805f03b776b4736895be73d9b8bbfe5
+    title: "Hafren Dyfrdwy Annual Performance Report 2023-24"
+    company_code: HDD
+    source_company_code: HDD
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Hafren_Dyfrdwy_Annual_Performance_Report_2023_2024/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: c8d941450226423491ff645318fa8832
+    title: "Hafren Dyfrdwy Annual Performance Report 2024-2025"
+    company_code: HDD
+    source_company_code: HDD
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/HDD_APR25_Stream_Updated_Mar_2026/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: e909caaa048746cfb536a936a907204a
+    title: "Hafren Dyfrdwy Annual Performance Report 2025-2026"
+    company_code: HDD
+    source_company_code: HDD
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/HDD_APR26_Stream/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: abb542354ccf4f2ab6eab8cd1ce54cc6
+    title: "Northumbrian Water Annual Performance Report 2023-24"
+    company_code: NES
+    source_company_code: NES
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Northumbrian_Water_APR_datatable_2023_24/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 087d4ca2079b45c9bc82c93c9881bd18
+    title: "Northumbrian Water Annual Performance Report 2024-25"
+    company_code: NES
+    source_company_code: NES
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Northumbrian_Water_Annual_Performance_Report_2024_25/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: e380e25688224c8790c93db244250fab
+    title: "Northumbrian Water Annual Performance Report 2025-26"
+    company_code: NES
+    source_company_code: NES
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Northumbrian_Water_APR_datatable_2025-26/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: ece7d427e1ad4f6885ca370fb80d04c4
+    title: "Portsmouth Water Annual Performance Report 2023-24"
+    company_code: PRT
+    source_company_code: PRT
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/APR24_all/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 90964511e5c143da945efdce0887dc98
+    title: "Portsmouth Water Annual Performance Report 2024/2025"
+    company_code: PRT
+    source_company_code: PRT
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/PRT_APR25/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 90635a4973ec425784fda4aecc5e7d1d
+    title: "Portsmouth Water Annual Performance Report 2025-26"
+    company_code: PRT
+    source_company_code: PRT
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Portsmouth_Water_Annual_Performance_Report_2025-26/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: b444aa4863e948878c54c51bcc21463d
+    title: "SES Water Annual Performance Report 2023_24"
+    company_code: SES
+    source_company_code: SES
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/apr_open_data_machine_readable_format_2023_2024/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: c539d0ad5b124fffa9ad9c6f34beefa7
+    title: "SES Water Annual Performance Report (APR) 2024-2025"
+    company_code: SES
+    source_company_code: SES
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/SES_Water_Annual_Performance_Report_(APR)_2024_2025/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: bba9701c72c8454987696fc09c634c8e
+    title: "SES Water Annual Performance Report 2025-2026"
+    company_code: SES
+    source_company_code: SES
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/SES_Water_Annual_Performance_Report_2025-2026/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 41bb9a65e3aa4b7b90611a13280416c7
+    title: "South East  Water Annual Performance Report 2023_24"
+    company_code: SEW
+    source_company_code: SEW
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_East_Water_Annual_Performance_Report_2023_24/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 3634e73413f947c9b71a6bb889891485
+    title: "South East Water Annual Performance Report 2024_25"
+    company_code: SEW
+    source_company_code: SEW
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_East_Water_Annual_Performance_Report_2024_25/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 81c153dcaee24901a64a217fe1c1e554
+    title: "South East Water Annual Performance Report 2025_26"
+    company_code: SEW
+    source_company_code: SEW
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_East_Water_Annual_Performance_Report_2025_26/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 9a087ca695864108b859c542f455937e
+    title: "Southern Water Annual Performance Report 2023-24"
+    company_code: SRN
+    source_company_code: SRN
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Southern_Water_Annual_Performance_Report_2023_24_/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: ccd2a005a25e457caa6b85b929ebe9c3
+    title: "Southern Water Annual Performance Report 2024 2025"
+    company_code: SRN
+    source_company_code: SRN
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Southern_Water_Annual_Performance_Report_2024_2025_feature/FeatureServer
+    layer_id: 0
+    status: hold
+    hold_reason: 'Item licence is "N/A" (custom), not CC BY 4.0.'
+  - item_id: 59278ef8d3a44174a61b9be3d75c693c
+    title: "Southern Water Annual Performance Report 2025_26"
+    company_code: SRN
+    source_company_code: SRN
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Southern_Water_Annual_Performance_Report_2025_26/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 007303df27d2420c8d948ddb481e5bd5
+    title: "South Staffs Water Annual Performance Report 2023-24"
+    company_code: SSC
+    source_company_code: SSC
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/SSC_APR_23_24/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 0690221de5774c33bab091608c03463a
+    title: "South Staffs Water Annual Performance Report 2024-25"
+    company_code: SSC
+    source_company_code: SSC
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: csv
+    status: hold
+    hold_reason: 'Item has no licence; the CC BY 4.0 Feature Service item 47bfd50c920b4b049df65828d88b4818 covers the same company and year.'
+  - item_id: 47bfd50c920b4b049df65828d88b4818
+    title: "South Staffs Water Annual Performance Report 2024-25"
+    company_code: SSC
+    source_company_code: SSC
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_Staffs_Water_Annual_Performance_Report_2024_25/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 770b0d389ffb47288706bf2d49b492b2
+    title: "South Staffs Annual Performance Report 2025-26"
+    company_code: SSC
+    source_company_code: SSC
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_Staffs_Annual_Performance_Report_2025_26/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 5a0d50e078ca44e2a459da9723018836
+    title: "Severn Trent Water Annual Performance Report 2023-24"
+    company_code: SVE
+    source_company_code: SVE
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Severn_Trent_Water_Annual_Performance_Report_2023_2024/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 8f1fa86d95ac40ad9363036db222b09e
+    title: "Severn Trent Water Annual Performance Report 2024-2025"
+    company_code: SVE
+    source_company_code: SVE
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/SVE_APR25_Stream_Updated_Mar_2026/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 9ccbaf0174a0438485283255644a0867
+    title: "Severn Trent Water Annual Performance Report 2025-2026"
+    company_code: SVE
+    source_company_code: SVE
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/SVE_APR26_Stream/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 24b862dea9b74867a47137f7674535b9
+    title: "South West Water (Whole area) Annual Performance report 2024"
+    company_code: SWB
+    source_company_code: SBB
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(Whole_area)_Annual_Performance_report_2024_/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 4e618157f84745739a90ca5030dfbd11
+    title: "South West Water (excl Bristol Water) Annual Performance report 2024"
+    company_code: SWB
+    source_company_code: SWB
+    financial_year: "2023-24"
+    reporting_area: south_west_area
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(excl_Bristol_Water)_Annual_Performance_report_2024/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 9986527d0537406cb8b51f4a9e56a5dc
+    title: "South West Water (whole area) Annual Performance Report (APR) 2024-2025"
+    company_code: SWB
+    source_company_code: SBB
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(whole_area)_Annual_Performance_Report_(APR)_2024_2025/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: fd88d4b2eaee4c8398fbbd8d2b831357
+    title: "South West Water (South West Area) Annual Performance Report (APR) 2024-2025"
+    company_code: SWB
+    source_company_code: SWB
+    financial_year: "2024-25"
+    reporting_area: south_west_area
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(South_West_Area)_Annual_Performance_Report_(APR)_2024_2025/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 0557052872cb40e48835fdb57b167dbf
+    title: "South West Water (all regions) Annual Performance Report 2025-2026"
+    company_code: SWB
+    source_company_code: SBB
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(all_regions)_Annual_Performance_Report_2025-2026/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 51b16f5e3102406b9749c0b1a36b8d07
+    title: "South West Water (South West) Annual Performance Report 2025-2026"
+    company_code: SWB
+    source_company_code: SWB
+    financial_year: "2025-26"
+    reporting_area: south_west_area
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/South_West_Water_(South_West)_Annual_Performance_Report_2025-2026/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: f49708822eca408480eedf255532613a
+    title: "United Utilities Annual Performance Report 2023-24"
+    company_code: UUW
+    source_company_code: UUW
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/APR_2023_24_combined_table_data/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: e0fbbbae41f24b29a362d3c73ef356ba
+    title: "United Utilities Annual Performance Report 2024_2025"
+    company_code: UUW
+    source_company_code: UUW
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/United_Utilities_Annual_Performance_Report_2024_2025/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 784c8906976d4b7c93099c8426ed0374
+    title: "United Utilities Annual Performance Report 2025-2026"
+    company_code: UUW
+    source_company_code: UUW
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/United_Utilities_Annual_Performance_Report_2025-2026/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: c6af92ff41d84b74815ad07f737faea8
+    title: "Dwr Cymru Welsh Water Annual Performance Report 2023/2024"
+    company_code: WSH
+    source_company_code: DCWW
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/DCWW_APR_23_24/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: e1be9a5b21f345e1add443dd3d72b433
+    title: "Dwr Cymru Welsh Water Annual Performance Report 2024/2025"
+    company_code: WSH
+    source_company_code: WSH
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/30_07_2025_1134/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 3a181b71d29c4986beaad9424796c984
+    title: "Dwr Cymru Welsh Water Annual Performance report 2025/2026"
+    company_code: WSH
+    source_company_code: WSH
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/DC_20_07_2026_1412/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 5836dab5c9dc456890e1de7b717ae1ed
+    title: "Wessex Water Annual Performance Report 2023-2024"
+    company_code: WSX
+    source_company_code: WSX
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Wessex_Water_Annual_Performance_Report_2023_2024/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: 2dc6cdfd736444e89e6b68585bd25ae0
+    title: "Wessex Water Annual Performance Report 2024-2025"
+    company_code: WSX
+    source_company_code: WSX
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services.arcgis.com/3SZ6e0uCvPROr4mS/arcgis/rest/services/Wessex_Water_Annual_Performance_Report_2024_2025/FeatureServer
+    layer_id: 0
+    status: enabled
+  - item_id: f3eb748daf844caea2f5820b06635929
+    title: "Wessex Water Annual Performance Report 2025-2026"
+    company_code: WSX
+    source_company_code: WSX
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services.arcgis.com/3SZ6e0uCvPROr4mS/arcgis/rest/services/Wessex_Water_Annual_Performance_Report_20252026_view/FeatureServer
+    layer_id: 2
+    status: enabled
+  - item_id: 53647511420f463090ece604fe9791a2
+    title: "Yorkshire Water Annual Performance Report 2023-24"
+    company_code: YKY
+    source_company_code: YKY
+    financial_year: "2023-24"
+    reporting_area: whole_company
+    item_type: csv
+    status: enabled
+  - item_id: f3c81d9508e445398bbe044b78ad2957
+    title: "Yorkshire Water Annual Performance Report 2024-25"
+    company_code: YKY
+    source_company_code: YKY
+    financial_year: "2024-25"
+    reporting_area: whole_company
+    item_type: csv
+    status: enabled
+  - item_id: 1087d8e2b1e34ace9bac72c9d6203bc7
+    title: "Yorkshire_Water_Annual_Performance_Report_2025-26"
+    company_code: YKY
+    source_company_code: YKY
+    financial_year: "2025-26"
+    reporting_area: whole_company
+    item_type: feature_service
+    service_url: https://services-eu1.arcgis.com/1WqkK5cDKUbF0CkH/arcgis/rest/services/Yorkshire_Water_Annual_Performance_Report_2025-26/FeatureServer
+    layer_id: 0
+    status: enabled

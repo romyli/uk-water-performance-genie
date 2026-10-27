@@ -1,0 +1,40 @@
+# Source data never belongs in the repository. Runtime data lives in Unity Catalog Volumes.
+*.xlsx
+*.xlsm
+*.xls
+*.xlsb
+*.csv
+*.parquet
+*.pdf
+*.zip
+*.ashx
+/data/
+/downloads/
+# Governed configuration tables are the only tracked CSV files.
+!bundles/data/src/water_performance/config/*.csv
+
+# Personal deployment values (see config.example.yml)
+config.yml
+*.local.yml
+.env
+.databrickscfg
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+# The Genie mutator environment is resolved from the exact pin in bundles/genie/pyproject.toml.
+uv.lock
+dist/
+build/
+*.egg-info/
+
+# Databricks bundle state
+.databricks/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/

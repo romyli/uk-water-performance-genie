@@ -1,0 +1,57 @@
+# Deployment checklist. Copy to config.yml (ignored by git) to keep your values in one place,
+# then pass each one to the CLI as --var <name>=<value> or export it as BUNDLE_VAR_<name>.
+# Every key here is a bundle variable with the same name in bundles/data and/or bundles/genie.
+#
+#   export BUNDLE_VAR_catalog=<catalog>
+#   databricks bundle validate --strict -t prod --profile <profile>
+#
+# The values below are placeholders. Replace every <...>.
+
+# Required for both bundles -------------------------------------------------------------------
+
+# An existing Unity Catalog catalog. The data bundle creates its schemas inside it.
+catalog: <catalog>
+
+# Workspace folder for the bundles' files, state and the Genie space.
+# Example: /Workspace/Shared/uk-water-performance
+workspace_base: <workspace folder>
+
+# The SQL warehouse Genie and SQL users query with, by its exact name (not its ID).
+warehouse_name: <SQL warehouse name>
+
+# Required for the data bundle -----------------------------------------------------------------
+
+# Your company's Ofwat code. This is the only company setting: the name, service type and
+# jurisdiction come from bundles/data/src/water_performance/config/companies.csv.
+# Accepted: AFW ANH BRL HDD NES PRT SES SEW SRN SSC SVE SWB TMS UUW WSH WSX YKY
+company_code: <company code>
+
+# Required for the prod target -----------------------------------------------------------------
+
+# Application ID (a UUID) of the service principal that runs production jobs.
+production_run_as: <service principal application ID>
+
+# Group that reads Gold and uses the Genie space.
+analyst_group: <analyst group name>
+
+# Group that runs refreshes, uploads manual-bootstrap files and reads operational tables.
+data_owner_group: <data owner group name>
+
+# Optional ----------------------------------------------------------------------------------------
+
+# Email addresses told when a job fails. A list; pass on the CLI as JSON:
+#   --var 'notification_emails=["data-team@example.com"]'
+# notification_emails: []
+
+# Scheduled refreshes. Runs are manual until you set UNPAUSED.
+# refresh_schedule_status: PAUSED
+# refresh_schedule_cron: "0 0 6 ? * MON"
+
+# Schema and Volume names, if your naming standard needs different ones. Use the same values
+# for both bundles.
+# landing_schema: water_performance_landing
+# ops_schema: water_performance_ops
+# silver_schema: water_performance_silver
+# gold_schema: water_performance_gold
+# test_schema: water_performance_test
+# documents_volume: curated_documents

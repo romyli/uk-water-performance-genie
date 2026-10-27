@@ -1,0 +1,9 @@
+publisher_code,company_code,reporting_area,description
+SWB,SWB,south_west_area,South West Water's South West area (Stream items)
+BRL,SWB,bristol_area,South West Water's Bristol area (Stream items after the Bristol Water merger)
+SBB,SWB,whole_company,South West Water whole company (Stream items)
+DCWW,WSH,whole_company,Dŵr Cymru Welsh Water (Stream 2023-24 item code)
+NNE,NES,northumbrian_region,Northumbrian Water - Northumbrian region (Ofwat WCPR)
+ESK,NES,essex_suffolk_region,Northumbrian Water - Essex and Suffolk region (Ofwat WCPR)
+CAM,SSC,cambridge_region,South Staffs Water - Cambridge region (Ofwat WCPR)
+SST,SSC,south_staffordshire_region,South Staffs Water - South Staffordshire region (Ofwat WCPR)

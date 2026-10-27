@@ -1,0 +1,203 @@
+# refresh_performance: retrieve public sources, archive them, parse each source, conform Silver,
+# build a Gold candidate release, gate it, and publish it in one atomic step.
+#
+# Every task is a serverless Python task that calls the tested water_performance package through
+# src/tasks/run_stage.py. A source that fails to retrieve or parse does not stop independent
+# sources; the last published release stays live until a new candidate passes every blocking gate.
+resources:
+  jobs:
+    refresh_performance:
+      name: uk-water-performance-refresh
+      description: >-
+        Retrieves the enabled public sources, archives each version by checksum, parses them into
+        Silver, builds and quality-gates a Gold candidate release, and publishes it atomically.
+        A failed source or gate leaves the previously published release in place.
+      max_concurrent_runs: 1
+      queue:
+        enabled: true
+      timeout_seconds: 10800
+      tags:
+        project: uk-water-performance
+      email_notifications:
+        on_failure: ${var.notification_emails}
+      schedule:
+        quartz_cron_expression: ${var.refresh_schedule_cron}
+        timezone_id: Europe/London
+        pause_status: ${var.refresh_schedule_status}
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: ${var.serverless_environment_version}
+            dependencies:
+              - openpyxl>=3.1,<4
+              - pyyaml>=6,<7
+              - pypdf>=4,<6
+      tasks:
+        - task_key: setup
+          description: Apply schema migrations, validate the company setting and snapshot the source registry.
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            # The deployment target, passed to every task as one JSON argument (anchored here).
+            parameters:
+              - setup
+              - --target
+              - &target >-
+                {"catalog": "${var.catalog}",
+                "landing_schema": "${resources.schemas.landing.name}",
+                "ops_schema": "${resources.schemas.ops.name}",
+                "silver_schema": "${resources.schemas.silver.name}",
+                "gold_schema": "${resources.schemas.gold.name}",
+                "test_schema": "${resources.schemas.test.name}",
+                "raw_volume": "${resources.volumes.raw.name}",
+                "archive_volume": "${resources.volumes.archive.name}",
+                "documents_volume": "${resources.volumes.curated_documents.name}",
+                "reports_volume": "${resources.volumes.validation_reports.name}",
+                "company_code": "${var.company_code}"}
+              - --run-id
+              - "{{job.run_id}}"
+
+        - task_key: discover_sources
+          description: List public Stream APR items and record any that are not registered.
+          depends_on: [{task_key: setup}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [discover, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: fetch_stream_apr
+          description: Snapshot every registered, CC BY 4.0 Stream APR item through the ArcGIS API.
+          depends_on: [{task_key: setup}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [fetch, --source-id, STREAM_APR, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: fetch_ofwat_wcpr
+          description: Download the registered Ofwat Water Company Performance Report open-data assets.
+          depends_on: [{task_key: setup}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [fetch, --source-id, OFWAT_WCPR, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: fetch_ofwat_pr24_outcomes
+          description: Download the registered PR24 final determination outcomes dataset.
+          depends_on: [{task_key: setup}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [fetch, --source-id, OFWAT_PR24_OUTCOMES, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: fetch_ofwat_pr19_odi
+          description: Download the registered PR19 performance commitment and ODI dataset.
+          depends_on: [{task_key: setup}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [fetch, --source-id, OFWAT_PR19_ODI, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: fetch_rag_definitions
+          description: Download the registered RAG 4 table-definition guideline.
+          depends_on: [{task_key: setup}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [fetch, --source-id, RAG_DEFINITIONS, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: inventory_archive
+          description: Checksum retrievals and manual uploads, archive new versions and update the manifest.
+          depends_on:
+            - {task_key: discover_sources}
+            - {task_key: fetch_stream_apr}
+            - {task_key: fetch_ofwat_wcpr}
+            - {task_key: fetch_ofwat_pr24_outcomes}
+            - {task_key: fetch_ofwat_pr19_odi}
+            - {task_key: fetch_rag_definitions}
+          # A failed fetch keeps its last archived version; the other sources carry on.
+          run_if: ALL_DONE
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [inventory, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: parse_stream_apr
+          description: Parse Stream APR snapshots into Silver (schema varies by year).
+          depends_on: [{task_key: inventory_archive}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [parse, --source-id, STREAM_APR, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: parse_ofwat_wcpr
+          description: Parse Ofwat WCPR normalised open data into Silver.
+          depends_on: [{task_key: inventory_archive}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [parse, --source-id, OFWAT_WCPR, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: parse_ofwat_pr24_outcomes
+          description: Parse PR24 performance commitment levels into Silver.
+          depends_on: [{task_key: inventory_archive}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [parse, --source-id, OFWAT_PR24_OUTCOMES, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: parse_ofwat_pr19_odi
+          description: Parse PR19 performance, PCL met and ODI payments into Silver.
+          depends_on: [{task_key: inventory_archive}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [parse, --source-id, OFWAT_PR19_ODI, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: parse_rag_definitions
+          description: Record the RAG 4 guideline version and publish it as a citable document.
+          depends_on: [{task_key: inventory_archive}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [parse, --source-id, RAG_DEFINITIONS, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: conform_silver
+          description: Conform current, licence-verified observations to canonical company, area and year.
+          depends_on:
+            - {task_key: parse_stream_apr}
+            - {task_key: parse_ofwat_wcpr}
+            - {task_key: parse_ofwat_pr24_outcomes}
+            - {task_key: parse_ofwat_pr19_odi}
+            - {task_key: parse_rag_definitions}
+          # A failed parse keeps that source's previous Silver rows; the release gates decide what publishes.
+          run_if: ALL_DONE
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [conform, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: publish_gold
+          description: Build the Gold candidate release (invisible until finalize) and refresh Gold view definitions.
+          depends_on: [{task_key: conform_silver}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [publish, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: quality_gates
+          description: Grain, provenance, licence, comparability, completeness and freshness checks on the candidate.
+          depends_on: [{task_key: publish_gold}]
+          run_if: ALL_DONE
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [quality, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: finalize
+          description: Publish the candidate atomically if every blocking gate passed; fail the run if any stage failed.
+          depends_on: [{task_key: quality_gates}]
+          run_if: ALL_DONE
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [finalize, --target, *target, --run-id, "{{job.run_id}}"]

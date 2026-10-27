@@ -1,0 +1,10 @@
+resources:
+  volumes:
+    validation_reports:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.ops.name}
+      name: ${var.reports_volume}
+      volume_type: MANAGED
+      comment: Test and lint reports written by the validate_project job.
+      lifecycle:
+        prevent_destroy: true

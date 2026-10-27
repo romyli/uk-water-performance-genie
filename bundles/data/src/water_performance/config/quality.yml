@@ -1,0 +1,26 @@
+# Quality thresholds for each Gold candidate release. A failed blocking check stops publication and
+# leaves the previously published release live. Warnings are recorded but do not block.
+completeness:
+  OFWAT_WCPR:
+    # Companies with values in the latest report year of the latest release.
+    min_companies_latest_year: 16
+    min_rows: 5000
+  STREAM_APR:
+    # Distinct companies with at least one Stream APR item in the latest financial year loaded.
+    min_companies_latest_year: 10
+    min_rows: 100000
+  OFWAT_PR19_ODI:
+    min_companies: 16
+  OFWAT_PR24_OUTCOMES:
+    min_companies: 16
+freshness:
+  # The latest WCPR report year may lag the current financial year by at most this many years.
+  OFWAT_WCPR_max_report_year_lag: 2
+  # Stream APR data must include a financial year no older than this lag.
+  STREAM_APR_max_report_year_lag: 2
+reconciliation:
+  # More disagreements than this (WCPR versus Stream, same metric, company and year) is a warning.
+  max_disagreements_warning: 0
+retention:
+  # Release stores keep this many most recent published releases; older ones are deleted at finalize.
+  keep_published_releases: 5

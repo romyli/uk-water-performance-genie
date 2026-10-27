@@ -1,0 +1,10 @@
+resources:
+  volumes:
+    archive:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.landing.name}
+      name: ${var.archive_volume}
+      volume_type: MANAGED
+      comment: Immutable copies of every source version, addressed by SHA-256. Never attached to Genie.
+      lifecycle:
+        prevent_destroy: true

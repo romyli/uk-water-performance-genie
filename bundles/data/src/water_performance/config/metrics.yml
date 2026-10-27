@@ -1,0 +1,352 @@
+# Canonical metric crosswalk. Each metric says what it measures, its unit and price base, which way
+# is better, and whether companies may be ranked on it. `sources` lists the exact source items that
+# report it; a value is mapped only when every stated field matches.
+#
+# comparability: comparable      companies may be ranked when unit, period, service type and price
+#                                base also match (checked per row in Gold)
+#                not_comparable  shown for one company or as a trend; never ranked. Say why.
+# service_scope: all | water | wastewater (wastewater metrics do not apply to water-only companies)
+# regulatory_period: all, or AMP7 when the definition is a PR19 performance commitment
+# Rule fields: item_reference, rag_reference, attribute, line_description, unit (as published).
+# An attribute may contain {financial_year}, which matches the row's own financial year.
+contract_version: 1
+
+metrics:
+  # --- Water service: PR19 common performance commitments (AMP7) ---------------------------------
+  - metric_id: water_quality_cri
+    name: Water quality compliance (CRI)
+    theme: Drinking water
+    description: Compliance Risk Index score set by the Drinking Water Inspectorate. Lower is better; 0 is full compliance.
+    unit: CRI score
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: water
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3A_01 (RAG 4 table 3A.1)
+    synonyms: [CRI, compliance risk index, drinking water quality]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3A_01, unit: no.}
+
+  - metric_id: water_supply_interruptions
+    name: Water supply interruptions
+    theme: Water service
+    description: Average minutes lost per property from interruptions of three hours or more.
+    unit: minutes per property
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: water
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3A_02, published as hh:mm:ss and loaded as minutes
+    synonyms: [supply interruptions, interruptions, minutes lost]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3A_02, unit: minutes}
+
+  - metric_id: leakage_reduction_pct
+    name: Leakage reduction from the 2019-20 baseline
+    theme: Water service
+    description: Percentage reduction in three-year-average leakage from the 2019-20 baseline. Higher is better.
+    unit: percent
+    price_base: not_applicable
+    direction: higher_is_better
+    service_scope: water
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3A_03
+    synonyms: [leakage, leakage reduction]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3A_03, unit: "% in no."}
+
+  - metric_id: pcc_reduction_pct
+    name: Per capita consumption reduction from the 2019-20 baseline
+    theme: Water service
+    description: Percentage reduction in three-year-average per capita consumption from the 2019-20 baseline.
+    unit: percent
+    price_base: not_applicable
+    direction: higher_is_better
+    service_scope: water
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3A_04
+    synonyms: [PCC reduction, water use reduction]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3A_04, unit: "% in no."}
+
+  - metric_id: mains_repairs
+    name: Mains repairs
+    theme: Water service
+    description: Mains repairs per 1,000 km of mains.
+    unit: repairs per 1,000 km
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: water
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3A_05
+    synonyms: [mains bursts, burst mains]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3A_05, unit: no.}
+
+  - metric_id: unplanned_outage
+    name: Unplanned outage
+    theme: Water service
+    description: Temporary loss of peak week production capacity, as a percentage.
+    unit: percent of peak week production capacity
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: water
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3A_06
+    synonyms: [outage]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3A_06, unit: no.}
+
+  - metric_id: drought_restriction_risk
+    name: Risk of severe restrictions in a drought
+    theme: Resilience
+    description: Percentage of the population at risk of severe restrictions in a 1-in-200-year drought.
+    unit: percent of population
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: water
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3E_01
+    synonyms: [drought resilience]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3E_01, unit: no.}
+
+  # --- Wastewater: PR19 common performance commitments (AMP7) ------------------------------------
+  - metric_id: internal_sewer_flooding
+    name: Internal sewer flooding
+    theme: Wastewater
+    description: Internal sewer flooding incidents per 10,000 sewer connections.
+    unit: incidents per 10,000 connections
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: wastewater
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3B_01
+    synonyms: [sewer flooding, internal flooding]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3B_01, unit: no.}
+
+  - metric_id: pollution_incidents
+    name: Pollution incidents
+    theme: Environment
+    description: Category 1 to 3 pollution incidents per 10,000 km of sewer.
+    unit: incidents per 10,000 km of sewer
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: wastewater
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3B_02
+    synonyms: [pollution]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3B_02, unit: no.}
+
+  - metric_id: sewer_collapses
+    name: Sewer collapses
+    theme: Wastewater
+    description: Sewer collapses per 1,000 km of sewer.
+    unit: collapses per 1,000 km of sewer
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: wastewater
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3B_03
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3B_03, unit: no.}
+
+  - metric_id: treatment_works_compliance
+    name: Treatment works compliance
+    theme: Environment
+    description: Percentage of permitted sewage and water treatment works compliant with discharge permits.
+    unit: percent
+    price_base: not_applicable
+    direction: higher_is_better
+    service_scope: wastewater
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3B_04
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3B_04, unit: "% in no."}
+
+  - metric_id: sewer_flooding_storm_risk
+    name: Risk of sewer flooding in a storm
+    theme: Resilience
+    description: Percentage of the population at risk of sewer flooding in a 1-in-50-year storm.
+    unit: percent of population
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: wastewater
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 common performance commitment; Ofwat WCPR item APR3E_05
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3E_05, unit: no.}
+
+  # --- Customers ---------------------------------------------------------------------------------
+  - metric_id: cmex_score
+    name: C-MeX score
+    theme: Customers
+    description: Customer measure of experience score for residential customers. Higher is better.
+    unit: score
+    price_base: not_applicable
+    direction: higher_is_better
+    service_scope: all
+    regulatory_period: AMP7
+    comparability: comparable
+    definition_source: PR19 C-MeX; Ofwat WCPR item APR3C_03
+    synonyms: [C-MeX, customer experience, customer satisfaction]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3C_03, unit: no.}
+
+  # --- Water balance (all years) -------------------------------------------------------------------
+  - metric_id: per_capita_consumption
+    name: Per capita consumption
+    theme: Water service
+    description: Litres per person per day used by household customers (standardised annual figure).
+    unit: litres per person per day
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: water
+    regulatory_period: all
+    comparability: comparable
+    definition_source: Ofwat WCPR item APR3F_10 (RAG 4 table 3F.6); Stream table 3F.6 for reconciliation
+    synonyms: [PCC, water use per person, consumption]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3F_10, unit: lpd}
+      - {source_id: STREAM_APR, rag_reference: "3F.6", attribute: "Performance level | actual ({financial_year})", unit: lpd}
+
+  - metric_id: leakage_ml_per_day
+    name: Leakage (annual average)
+    theme: Water service
+    description: Total leakage in megalitres per day (actual annual figure).
+    unit: Ml/d
+    price_base: not_applicable
+    direction: lower_is_better
+    service_scope: water
+    regulatory_period: all
+    comparability: not_comparable
+    comparability_reason: Absolute leakage scales with network size. Rank companies on leakage_reduction_pct instead.
+    definition_source: Ofwat WCPR item APR3F_11 (RAG 4 table 3F.5); Stream table 3F.5
+    synonyms: [leakage volume]
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: APR3F_11, unit: Ml/day}
+      - {source_id: STREAM_APR, rag_reference: "3F.5", attribute: "Performance level | actual ({financial_year})", unit: Ml/d}
+
+  - metric_id: connected_properties_water
+    name: Properties connected for water supply
+    theme: Context
+    description: Domestic and non-domestic properties connected for water supply at year end, thousands.
+    unit: thousand properties
+    price_base: not_applicable
+    direction: not_applicable
+    service_scope: water
+    regulatory_period: all
+    comparability: not_comparable
+    comparability_reason: A size measure, not performance.
+    definition_source: Ofwat WCPR item BN1001 (RAG 4 table 4R.27)
+    sources:
+      - {source_id: OFWAT_WCPR, item_reference: BN1001, unit: 000s}
+
+  # --- Finance (Stream APR table 1, statutory accounts) -----------------------------------------------
+  - metric_id: revenue_statutory
+    name: Revenue (statutory)
+    theme: Finance
+    description: Revenue in the statutory accounts, APR table 1A line 1, GBP million.
+    unit: GBP million
+    price_base: nominal (outturn)
+    direction: not_applicable
+    service_scope: all
+    regulatory_period: all
+    comparability: not_comparable
+    comparability_reason: Absolute financial figures scale with company size and accounting choices; compare one company over time.
+    definition_source: RAG 4 table 1A.1, attribute Statutory
+    synonyms: [revenue, turnover, income]
+    sources:
+      - {source_id: STREAM_APR, rag_reference: "1A.1", attribute: Statutory, unit: £m}
+
+  - metric_id: operating_costs_statutory
+    name: Operating costs (statutory)
+    theme: Finance
+    description: Operating costs in the statutory accounts, APR table 1A line 2, GBP million.
+    unit: GBP million
+    price_base: nominal (outturn)
+    direction: not_applicable
+    service_scope: all
+    regulatory_period: all
+    comparability: not_comparable
+    comparability_reason: Absolute financial figures scale with company size and accounting choices; compare one company over time.
+    definition_source: RAG 4 table 1A.2, attribute Statutory
+    synonyms: [opex, operating costs, costs]
+    sources:
+      - {source_id: STREAM_APR, rag_reference: "1A.2", attribute: Statutory, unit: £m}
+
+  - metric_id: operating_profit_statutory
+    name: Operating profit (statutory)
+    theme: Finance
+    description: Operating profit in the statutory accounts, APR table 1A line 4, GBP million.
+    unit: GBP million
+    price_base: nominal (outturn)
+    direction: not_applicable
+    service_scope: all
+    regulatory_period: all
+    comparability: not_comparable
+    comparability_reason: Absolute financial figures scale with company size and accounting choices; compare one company over time.
+    definition_source: RAG 4 table 1A.4, attribute Statutory
+    sources:
+      - {source_id: STREAM_APR, rag_reference: "1A.4", attribute: Statutory, unit: £m}
+
+  - metric_id: profit_before_tax_statutory
+    name: Profit before tax (statutory)
+    theme: Finance
+    description: Profit before tax in the statutory accounts, APR table 1A line 11, GBP million.
+    unit: GBP million
+    price_base: nominal (outturn)
+    direction: not_applicable
+    service_scope: all
+    regulatory_period: all
+    comparability: not_comparable
+    comparability_reason: Absolute financial figures scale with company size and accounting choices; compare one company over time.
+    definition_source: RAG 4 table 1A.11, attribute Statutory
+    sources:
+      - {source_id: STREAM_APR, rag_reference: "1A.11", attribute: Statutory, unit: £m}
+
+  - metric_id: dividends_statutory
+    name: Dividends (statutory)
+    theme: Finance
+    description: Dividends in the statutory accounts, APR table 1A line 15, GBP million.
+    unit: GBP million
+    price_base: nominal (outturn)
+    direction: not_applicable
+    service_scope: all
+    regulatory_period: all
+    comparability: not_comparable
+    comparability_reason: Absolute financial figures scale with company size and accounting choices; compare one company over time.
+    definition_source: RAG 4 table 1A.15, attribute Statutory
+    synonyms: [dividends paid]
+    sources:
+      - {source_id: STREAM_APR, rag_reference: "1A.15", attribute: Statutory, unit: £m}
+
+  - metric_id: borrowings_non_current_statutory
+    name: Borrowings due after one year (statutory)
+    theme: Finance
+    description: Non-current borrowings in the statutory balance sheet, APR table 1C line 22, GBP million.
+    unit: GBP million
+    price_base: nominal (outturn)
+    direction: not_applicable
+    service_scope: all
+    regulatory_period: all
+    comparability: not_comparable
+    comparability_reason: Absolute financial figures scale with company size and financing structure; compare one company over time.
+    definition_source: RAG 4 table 1C.22, attribute Statutory
+    synonyms: [debt, long-term borrowings]
+    sources:
+      - {source_id: STREAM_APR, rag_reference: "1C.22", attribute: Statutory, unit: £m}

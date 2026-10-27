@@ -1,0 +1,345 @@
+# Machine-readable source registry. sources.md is the human register; tests check that the two agree.
+#
+# status:
+#   enabled      every acceptance field below is recorded; the source is ingested.
+#   conditional  the adapter exists, but each asset is ingested only after its licence is verified
+#                (licence_verification on the asset, or evidence found inside the asset itself).
+#   hold         not ingested. `hold_reason` says what is missing.
+#
+# retrieval_mode: api | direct_asset | manual_bootstrap
+# Asset-level `status` overrides the source status for that asset only (enabled | conditional | hold).
+contract_version: 1
+
+licences:
+  CC-BY-4.0:
+    name: Creative Commons Attribution 4.0 International
+    url: https://creativecommons.org/licenses/by/4.0/
+    redistribution: allowed_with_attribution
+  OGL-UK-3.0:
+    name: Open Government Licence v3.0
+    url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+    redistribution: allowed_with_attribution
+
+sources:
+  - source_id: STREAM_APR
+    title: Stream standardised Annual Performance Report datasets
+    priority: P0
+    status: enabled
+    publisher: Stream Water Data Portal (data published by each water company)
+    landing_page: https://www.streamwaterdata.co.uk/pages/annual-performance-reports
+    jurisdiction: england_wales
+    coverage: Participating England and Wales companies, report years 2023-24 onward; items are listed in stream_apr_items.yml
+    format: ArcGIS FeatureServer table or CSV item
+    retrieval_mode: api
+    api:
+      item_metadata_url: https://www.arcgis.com/sharing/rest/content/items/{item_id}?f=json
+      item_data_url: https://www.arcgis.com/sharing/rest/content/items/{item_id}/data
+      discovery_url: https://www.streamwaterdata.co.uk/api/search/v1/collections/dataset/items
+      page_size: 1000
+    licence:
+      id: CC-BY-4.0
+      evidence: Checked per item at retrieval; the item licenseInfo must link to creativecommons.org/licenses/by/4.0
+    attribution: "Contains {company_name} Annual Performance Report {financial_year} data, published on the Stream Water Data Portal and licensed under CC BY 4.0."
+    third_party_rights: None stated on the items registered here.
+    reporting_basis: Financial year (April to March) under the RAG 4 table definitions version named in each item's licence text
+    contract: stream_apr_v1
+    contract_version: 1
+    notes: Licence is set per item. Items whose licence is not CC BY 4.0 are recorded and rejected, never ingested.
+
+  - source_id: COMPANY_APR
+    title: Company Annual Performance Report data tables
+    priority: P0
+    status: hold
+    hold_reason: Publicly downloadable, but no company workbook registered here carries a recorded reuse licence. Stream copies are used where they exist.
+    publisher: Each water company
+    landing_page: null
+    jurisdiction: england_wales
+    coverage: Company-specific Excel tables; years vary by company
+    format: Excel workbook
+    retrieval_mode: manual_bootstrap
+    licence:
+      id: null
+      evidence: Not recorded for any company workbook
+    attribution: null
+    third_party_rights: Unknown
+    reporting_basis: Financial year under the RAG 4 version stated in each workbook
+    contract: company_apr_v1
+    contract_version: 1
+    notes: Fallback for company/years missing from Stream. Enable a workbook only after recording its publisher's reuse terms.
+
+  - source_id: OFWAT_WCPR
+    title: Ofwat Water Company Performance Report open data (normalised)
+    priority: P0
+    status: enabled
+    publisher: Ofwat (Water Services Regulation Authority)
+    landing_page: https://www.ofwat.gov.uk/publication/data-for-the-water-company-performance-report-2024-25-open-data-friendly-machine-readable-format/
+    jurisdiction: england_wales
+    coverage: All England and Wales companies; report years 2017-18 onward in each release
+    format: CSV or Excel workbook in long (normalised) layout
+    retrieval_mode: direct_asset
+    licence:
+      id: OGL-UK-3.0
+      evidence: Ofwat states that data on the Water Company Performance Report data pages is released under the Open Government Licence v3.0.
+    attribution: "Contains public sector information from Ofwat's Water Company Performance Report {release} licensed under the Open Government Licence v3.0."
+    third_party_rights: None stated.
+    reporting_basis: Financial year; values as reported to Ofwat for the Water Company Performance Report
+    contract: ofwat_wcpr_normalised_v1
+    contract_version: 1
+    notes: Ofwat landing pages present a browser check to automated clients, so they are recorded but not fetched. The asset URLs below are fetched directly.
+    assets:
+      - asset_id: wcpr_2023_24_normalised_csv
+        release: 2023-24 (October 2024)
+        report_year_to: 2024
+        published: 2024-10-08
+        url: https://www.ofwat.gov.uk/wp-content/uploads/2024/10/WCPR_2023-24-Open-Data-Machine-Readable-Normalised.csv
+        landing_page: https://www.ofwat.gov.uk/publication/data-for-the-water-company-performance-report-2023-24-open-data-friendly-machine-readable-format/
+      - asset_id: wcpr_2024_25_normalised_csv
+        release: 2024-25 (October 2025)
+        report_year_to: 2025
+        published: 2025-10-23
+        status: hold
+        hold_reason: The asset URL returned HTTP 404 on 2026-10-27. The post-final-determination update below replaces it.
+        url: https://www.ofwat.gov.uk/wp-content/uploads/2025/10/WCPR_2024-25-Open-Data-Machine-Readable-Normalised.csv
+        landing_page: https://www.ofwat.gov.uk/publication/data-for-the-water-company-performance-report-2024-25-open-data-friendly-machine-readable-format/
+      - asset_id: wcpr_2024_25_normalised_post_fd_xlsx
+        release: 2024-25 post-final-determination update
+        report_year_to: 2025
+        published: null
+        url: https://www.ofwat.gov.uk/wp-content/uploads/2025/10/WCPR_2024-25-Open-Data-Machine-Readable-Normalised-PostFDUpdate.xlsx
+        landing_page: https://www.ofwat.gov.uk/publication/data-for-the-water-company-performance-report-2024-25-open-data-friendly-machine-readable-format/
+        supersedes: wcpr_2024_25_normalised_csv
+
+  - source_id: OFWAT_PR24_OUTCOMES
+    title: Ofwat PR24 final determinations, Key Dataset 1 (Outcomes data)
+    priority: P0
+    status: conditional
+    publisher: Ofwat (Water Services Regulation Authority)
+    landing_page: https://www.ofwat.gov.uk/regulated-companies/price-review/2024-price-review/final-determinations-models/
+    jurisdiction: england_wales
+    coverage: All England and Wales companies; performance commitment levels for 2025-26 to 2029-30 (AMP8)
+    format: Excel workbook
+    retrieval_mode: direct_asset
+    licence:
+      id: OGL-UK-3.0
+      evidence: Ofwat publications are generally released under OGL v3.0. Verified per asset by an Open Government Licence statement inside the workbook, or by an operator recording the landing-page statement.
+    attribution: "Contains public sector information from Ofwat's PR24 final determinations ({release}) licensed under the Open Government Licence v3.0."
+    third_party_rights: Retain any exception stated on the asset.
+    reporting_basis: Financial year; PR24 (AMP8, 2025-30) performance commitment definitions
+    contract: ofwat_pr24_outcomes_v1
+    contract_version: 1
+    notes: Ofwat republishes this dataset; each version is a separate release.
+    assets:
+      - asset_id: pr24_key_dataset_1_outcomes_v9
+        release: Key Dataset 1 Outcomes data V9
+        published: 2025-06
+        url: https://www.ofwat.gov.uk/wp-content/uploads/2025/06/PR24-Key-Dataset-1-Outcomes-data-V9.xlsx
+        landing_page: https://www.ofwat.gov.uk/regulated-companies/price-review/2024-price-review/final-determinations-models/
+        licence_verification: in_asset_statement
+
+  - source_id: OFWAT_PR19_ODI
+    title: Ofwat PR19 performance commitments and ODIs, final view of 2020-25 performance
+    priority: P0
+    status: conditional
+    publisher: Ofwat (Water Services Regulation Authority)
+    landing_page: https://www.ofwat.gov.uk/regulated-companies/price-review/in-period-odi-determinations/
+    jurisdiction: england_wales
+    coverage: All England and Wales companies; PR19 (AMP7) report years 2020-21 to 2024-25
+    format: Excel workbook
+    retrieval_mode: direct_asset
+    licence:
+      id: OGL-UK-3.0
+      evidence: Verified per asset by an Open Government Licence statement inside the workbook, or by an operator recording the landing-page statement.
+    attribution: "Contains public sector information from Ofwat's PR19 performance commitment and ODI data ({release}) licensed under the Open Government Licence v3.0."
+    third_party_rights: Retain any exception stated on the asset.
+    reporting_basis: Financial year; PR19 (AMP7, 2020-25) performance commitment definitions; ODI payments in the price base stated per row
+    contract: ofwat_pr19_odi_v1
+    contract_version: 1
+    notes: The publisher's copy is retrieved from Ofwat. A copy held elsewhere is never used.
+    assets:
+      - asset_id: pr19_outcome_pcs_and_odis_2020_25_v0_2
+        release: Outcome performance commitments and ODIs data 2020-25 v0.2
+        published: 2026-03
+        url: https://www.ofwat.gov.uk/wp-content/uploads/2026/03/Outcome-performance-commitments-and-ODIs-data_2020-25v0.2.xlsx
+        landing_page: https://www.ofwat.gov.uk/regulated-companies/price-review/in-period-odi-determinations/
+        licence_verification: in_asset_statement
+
+  - source_id: RAG_DEFINITIONS
+    title: Ofwat RAG 4 guideline for the table definitions in the annual performance report
+    priority: P0
+    status: conditional
+    publisher: Ofwat (Water Services Regulation Authority)
+    landing_page: https://www.ofwat.gov.uk/publication/rag-4-14-guideline-for-the-table-definitions-in-the-annual-performance-report/
+    jurisdiction: england_wales
+    coverage: APR table and line definitions; one guideline version per release
+    format: PDF document
+    retrieval_mode: direct_asset
+    licence:
+      id: OGL-UK-3.0
+      evidence: Verified per asset by an Open Government Licence statement inside the document, or by an operator recording the landing-page statement.
+    attribution: "Contains public sector information from Ofwat's {release} licensed under the Open Government Licence v3.0."
+    third_party_rights: Retain any exception stated on the document.
+    reporting_basis: Semantic metadata; not an observation source
+    contract: rag_guideline_document_v1
+    contract_version: 1
+    notes: Stored as versioned reference metadata and, once licence-verified, as a citable document for Genie.
+    assets:
+      - asset_id: rag_4_14_table_definitions
+        release: RAG 4.14
+        published: 2026-03-31
+        url: https://www.ofwat.gov.uk/wp-content/uploads/2026/03/RAG-4.14-%E2%80%93-Guideline-for-the-table-definitions-in-the-annual-performance-report.pdf
+        landing_page: https://www.ofwat.gov.uk/publication/rag-4-14-guideline-for-the-table-definitions-in-the-annual-performance-report/
+        licence_verification: in_asset_statement
+
+  - source_id: EA_EPA
+    title: Environment Agency environmental performance assessment
+    priority: P1
+    status: hold
+    hold_reason: No bulk machine-readable asset with a parser contract has been registered; company tables are HTML and linked documents.
+    publisher: Environment Agency
+    landing_page: https://www.gov.uk/government/publications/water-and-sewerage-companies-in-england-environmental-performance-report-2024
+    jurisdiction: england
+    coverage: Nine English water and sewerage companies; calendar years
+    format: HTML tables and linked documents
+    retrieval_mode: direct_asset
+    licence:
+      id: OGL-UK-3.0
+      evidence: OGL v3.0 statement on GOV.UK
+    attribution: "Contains public sector information from the Environment Agency licensed under the Open Government Licence v3.0."
+    third_party_rights: None stated.
+    reporting_basis: Calendar year
+    contract: null
+    contract_version: null
+    notes: Excludes water-only companies. Never join calendar-year facts to financial-year facts without stating the basis.
+
+  - source_id: EA_EDM
+    title: Event Duration Monitoring, storm overflow annual returns
+    priority: P1
+    status: hold
+    hold_reason: Licence and schema must be confirmed for each annual release before a parser contract is recorded.
+    publisher: Environment Agency
+    landing_page: https://www.data.gov.uk/dataset/19f6064d-7356-466f-844e-d20ea10ae9fd/event-duration-monitoring-storm-overflows-annual-returns
+    jurisdiction: england
+    coverage: Site-level storm overflow returns, calendar years 2020 onward
+    format: Excel/CSV per annual release
+    retrieval_mode: direct_asset
+    licence:
+      id: OGL-UK-3.0
+      evidence: To be confirmed per release on data.gov.uk
+    attribution: "Contains public sector information from the Environment Agency licensed under the Open Government Licence v3.0."
+    third_party_rights: To be confirmed per release.
+    reporting_basis: Calendar year
+    contract: null
+    contract_version: null
+    notes: Weather affects spill counts; avoid causal statements.
+
+  - source_id: DWI_COMPANY
+    title: Drinking Water Inspectorate company performance data
+    priority: P1
+    status: hold
+    hold_reason: Published through a Power BI dashboard with no documented bulk export or API.
+    publisher: Drinking Water Inspectorate
+    landing_page: https://www.dwi.gov.uk/what-we-do/annual-report/drinking-water-2025/company-performance-data/
+    jurisdiction: england_wales
+    coverage: Annual compliance by company
+    format: Dashboard
+    retrieval_mode: manual_bootstrap
+    licence:
+      id: OGL-UK-3.0
+      evidence: OGL v3.0 statement on the DWI website
+    attribution: "Contains public sector information from the Drinking Water Inspectorate licensed under the Open Government Licence v3.0."
+    third_party_rights: None stated.
+    reporting_basis: Calendar year
+    contract: null
+    contract_version: null
+    notes: Cite the published report; do not scrape the dashboard.
+
+  - source_id: CCW_COMPLAINTS
+    title: CCW household complaint performance
+    priority: P1
+    status: hold
+    hold_reason: The reuse licence for extracted complaint tables has not been confirmed.
+    publisher: Consumer Council for Water (CCW)
+    landing_page: https://www.ccw.org.uk/advice-and-support/complaint-performance/
+    jurisdiction: england_wales
+    coverage: Household complaints, quarterly (unaudited) and annual
+    format: HTML tables and annual reports
+    retrieval_mode: manual_bootstrap
+    licence:
+      id: null
+      evidence: Not confirmed
+    attribution: null
+    third_party_rights: Unknown
+    reporting_basis: Financial year (annual) and quarter (unaudited)
+    contract: null
+    contract_version: null
+    notes: Quarterly values are unaudited and may be revised.
+
+  - source_id: COMPANY_BOUNDARIES
+    title: Stream water company boundaries
+    priority: P1
+    status: hold
+    hold_reason: Geography is context only and no geography questions are in the first release.
+    publisher: Stream Water Data Portal
+    landing_page: https://www.streamwaterdata.co.uk/datasets/ef5f5968a9ee449d8373baf8be7237ea_0/explore
+    jurisdiction: england_wales
+    coverage: Supply and wastewater service areas
+    format: ArcGIS feature layer
+    retrieval_mode: api
+    licence:
+      id: null
+      evidence: To be read from the item at registration
+    attribution: null
+    third_party_rights: To be confirmed.
+    reporting_basis: Spatial context
+    contract: null
+    contract_version: null
+    notes: Water-supply and wastewater boundaries differ; a postcode can have two suppliers.
+
+  - source_id: WICS_RETURN
+    title: WICS Annual Return and Regulatory Accounts (Scottish Water)
+    priority: P2
+    status: hold
+    hold_reason: Scotland needs a separate jurisdiction adapter; Ofwat parsers must never run over it.
+    publisher: Water Industry Commission for Scotland
+    landing_page: https://wics.scot/publications/scottish-water/annual-return-regulatory-accounts
+    jurisdiction: scotland
+    coverage: Scottish Water
+    format: Excel and PDF
+    retrieval_mode: direct_asset
+    licence:
+      id: null
+      evidence: To be verified per asset
+    attribution: null
+    third_party_rights: Unknown
+    reporting_basis: Financial year under WICS definitions
+    contract: null
+    contract_version: null
+    notes: Not like-for-like with Ofwat APR or performance commitments.
+
+  - source_id: NI_AIR
+    title: Northern Ireland Water Annual Information Return
+    priority: P2
+    status: hold
+    hold_reason: Northern Ireland needs a separate jurisdiction adapter; Ofwat parsers must never run over it.
+    publisher: Utility Regulator (Northern Ireland)
+    landing_page: https://www.uregni.gov.uk/publications/annual-information-reporting-2024-0
+    jurisdiction: northern_ireland
+    coverage: NI Water
+    format: Excel and PDF
+    retrieval_mode: direct_asset
+    licence:
+      id: null
+      evidence: To be verified per asset
+    attribution: null
+    third_party_rights: Unknown
+    reporting_basis: Financial year under Utility Regulator definitions
+    contract: null
+    contract_version: null
+    notes: Not like-for-like with Ofwat APR or performance commitments.
+
+# Inputs that must never be enabled from a private copy. Tests fail if any appears as an enabled source.
+forbidden_inputs:
+  - name: APR industry datashare workbooks
+    reason: No public landing page or reuse licence has been established for these files.
+  - name: Private copies of the consolidated PR19 outcomes workbook
+    reason: Only the publisher's own copy, retrieved from Ofwat, may be used (see OFWAT_PR19_ODI).

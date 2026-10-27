@@ -1,0 +1,274 @@
+# Genie benchmark questions. tools/sync_benchmarks.py copies them into the Genie space's native
+# benchmarks; the repository tests fail if the two drift apart.
+#
+# Ground truth is SQL that runs against Gold, never a typed number. Questions about the deploying
+# company read deployment_context, so the same benchmark works for every company setting.
+# SQL uses the authoring names; the Genie bundle retargets them on deploy.
+#
+# critical: the failure classes that make an answer unacceptable whatever the score:
+#   company_scope   answered for the wrong company
+#   comparability   ranked or compared rows that are not comparable
+#   fabrication     gave a number that is not in Gold
+#   provenance      missing or wrong source citation
+version: 1
+gates:
+  min_pass_rate: 0.70
+  critical_failures_allowed: 0
+  needs_review_counts_as: not_passed
+
+questions:
+  - id: b01
+    category: configured_company_summary
+    question: Which of our PR19 performance commitments did we meet in 2023-24?
+    critical: [company_scope, fabrication]
+    expected_behaviour: Uses the configured company from deployment_context and says which company that is.
+    sql: |
+      SELECT pc_name, commitment_level, actual_performance, unit, pcl_met
+      FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual
+      WHERE is_configured_company AND price_review = 'PR19' AND financial_year = '2023-24' AND pcl_met = 'Yes'
+      ORDER BY pc_name
+
+  - id: b02
+    category: missed_targets
+    question: Which performance commitments did we miss in 2024-25?
+    critical: [company_scope, fabrication]
+    expected_behaviour: Lists PR19 commitments with pcl_met = No for the configured company in 2024-25.
+    sql: |
+      SELECT pc_name, commitment_level, actual_performance, unit
+      FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual
+      WHERE is_configured_company AND price_review = 'PR19' AND financial_year = '2024-25' AND pcl_met = 'No'
+      ORDER BY pc_name
+
+  - id: b03
+    category: trend
+    question: How has our per capita consumption changed since 2017-18?
+    critical: [company_scope]
+    expected_behaviour: Litres per person per day by financial year for the configured company, preferred source only.
+    sql: |
+      SELECT financial_year, value, unit
+      FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance
+      WHERE is_configured_company AND metric_id = 'per_capita_consumption' AND is_preferred_source
+        AND reporting_area = 'whole_company' AND report_year >= 2018
+      ORDER BY report_year
+
+  - id: b04
+    category: target_vs_actual
+    question: What was our water supply interruptions target and actual performance each year of 2020-25?
+    critical: [company_scope, fabrication]
+    expected_behaviour: PR19 commitment level and actual in minutes per property, by year.
+    sql: |
+      SELECT financial_year, commitment_level, actual_performance, unit, pcl_met
+      FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual
+      WHERE is_configured_company AND price_review = 'PR19' AND lower(pc_name) = 'water supply interruptions'
+      ORDER BY report_year
+
+  - id: b05
+    category: odi
+    question: What were our net ODI payments by year for 2020-25, after aggregate sharing?
+    critical: [company_scope, fabrication]
+    expected_behaviour: Sums price-control rows only, in GBP million at 2017-18 prices; never adds commitment-level rows.
+    sql: |
+      SELECT financial_year, round(sum(payment_gbp_m), 3) AS net_odi_payment_gbp_m
+      FROM uk_water_performance_genie.water_performance_gold.vw_odi_position
+      WHERE is_configured_company AND level = 'price_control'
+      GROUP BY financial_year ORDER BY financial_year
+
+  - id: b06
+    category: odi
+    question: Which three performance commitments cost us the most in ODI penalties over 2020-25?
+    critical: [company_scope, fabrication]
+    expected_behaviour: Commitment-level payments before aggregate sharing, summed over 2020-25, most negative first.
+    sql: |
+      SELECT pc_name, round(sum(payment_gbp_m), 3) AS total_payment_gbp_m
+      FROM uk_water_performance_genie.water_performance_gold.vw_odi_position
+      WHERE is_configured_company AND level = 'performance_commitment'
+      GROUP BY pc_name ORDER BY total_payment_gbp_m ASC LIMIT 3
+
+  - id: b07
+    category: finance
+    question: Show United Utilities' statutory revenue and operating costs for each year held.
+    critical: [company_scope, fabrication]
+    expected_behaviour: Uses the named company, not the configured one. GBP million, nominal prices.
+    sql: |
+      SELECT financial_year, metric_id, value
+      FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance
+      WHERE company_code = 'UUW' AND metric_id IN ('revenue_statutory', 'operating_costs_statutory')
+      ORDER BY financial_year, metric_id
+
+  - id: b08
+    category: peers_rank
+    question: Rank companies on water supply interruptions in 2023-24.
+    critical: [comparability]
+    expected_behaviour: Comparable whole-company values only, lowest minutes ranked first.
+    sql: |
+      SELECT company_name, value, unit, rank_in_peer_group
+      FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison
+      WHERE metric_id = 'water_supply_interruptions' AND financial_year = '2023-24'
+      ORDER BY rank_in_peer_group, company_name
+
+  - id: b09
+    category: peers_rank
+    question: Where do we rank on internal sewer flooding in 2023-24, and how many companies are compared?
+    critical: [company_scope, comparability]
+    expected_behaviour: Water and sewerage companies only; states the rank and the number compared.
+    sql: |
+      SELECT rank_in_peer_group, companies_in_peer_group
+      FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison
+      WHERE metric_id = 'internal_sewer_flooding' AND financial_year = '2023-24' AND is_configured_company
+
+  - id: b10
+    category: peers_rank
+    question: What was our C-MeX score in 2023-24 compared with the median of all companies?
+    critical: [company_scope, comparability]
+    expected_behaviour: Uses the metric view measures or the peer median; higher is better.
+    sql: |
+      SELECT value AS company_score, peer_median
+      FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison
+      WHERE metric_id = 'cmex_score' AND financial_year = '2023-24' AND is_configured_company
+
+  - id: b11
+    category: customer
+    question: What was our C-MeX score each year?
+    critical: [company_scope]
+    expected_behaviour: C-MeX score by financial year for the configured company.
+    sql: |
+      SELECT financial_year, value
+      FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance
+      WHERE is_configured_company AND metric_id = 'cmex_score' AND is_preferred_source
+      ORDER BY report_year
+
+  - id: b12
+    category: environment
+    question: How many pollution incidents per 10,000 km of sewer did we have in each year of AMP7?
+    critical: [company_scope]
+    expected_behaviour: AMP7 years only; states the unit.
+    sql: |
+      SELECT financial_year, value
+      FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance
+      WHERE is_configured_company AND metric_id = 'pollution_incidents' AND amp = 'AMP7' AND is_preferred_source
+      ORDER BY financial_year
+
+  - id: b13
+    category: drinking_water
+    question: What was our water quality compliance (CRI) score in 2023-24?
+    critical: [company_scope, fabrication]
+    expected_behaviour: The CRI score for the configured company; lower is better.
+    sql: |
+      SELECT company_name, financial_year, value
+      FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance
+      WHERE is_configured_company AND metric_id = 'water_quality_cri' AND financial_year = '2023-24'
+        AND is_preferred_source
+
+  - id: b14
+    category: period_ambiguity
+    question: What was our leakage reduction in 2024?
+    critical: [company_scope]
+    expected_behaviour: Treats 2024 as the financial year ending 2024 (2023-24), says so, and offers 2024-25.
+    sql: |
+      SELECT financial_year, value, unit
+      FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance
+      WHERE is_configured_company AND metric_id = 'leakage_reduction_pct' AND report_year = 2024
+        AND is_preferred_source
+
+  - id: b15
+    category: explicit_company_override
+    question: Compare Severn Trent Water and United Utilities on mains repairs in 2023-24.
+    critical: [company_scope, comparability]
+    expected_behaviour: Exactly the two named companies; does not add the configured company.
+    sql: |
+      SELECT company_name, value, unit, rank_in_peer_group
+      FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison
+      WHERE metric_id = 'mains_repairs' AND financial_year = '2023-24' AND company_code IN ('SVE', 'UUW')
+      ORDER BY company_name
+
+  - id: b16
+    category: missing_data
+    question: How many complaints per 10,000 connections did we receive last year?
+    critical: [fabrication]
+    expected_behaviour: Says complaint data is not available in the public sources held (CCW is on hold) and gives no number.
+    sql: |
+      SELECT status, available_in_release, hold_reason
+      FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage
+      WHERE source_id = 'CCW_COMPLAINTS'
+
+  - id: b17
+    category: missing_data
+    question: What is our Environment Agency EPA star rating?
+    critical: [fabrication]
+    expected_behaviour: Says EPA data is not available in the public sources held and gives no rating.
+    sql: |
+      SELECT status, available_in_release, hold_reason
+      FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage
+      WHERE source_id = 'EA_EPA'
+
+  - id: b18
+    category: missing_data
+    question: How many drinking water sample failures did we have in 2024?
+    critical: [fabrication]
+    expected_behaviour: Says DWI sample data is not available in the public sources held; may offer the CRI score instead.
+    sql: |
+      SELECT status, available_in_release, hold_reason
+      FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage
+      WHERE source_id = 'DWI_COMPANY'
+
+  - id: b19
+    category: non_comparable
+    question: Rank all companies by total leakage in megalitres per day for 2023-24.
+    critical: [comparability]
+    expected_behaviour: Declines to rank absolute leakage, explains why, and offers leakage reduction from baseline.
+    sql: |
+      SELECT DISTINCT comparability_reason
+      FROM uk_water_performance_genie.water_performance_gold.vw_reported_performance
+      WHERE metric_id = 'leakage_ml_per_day'
+
+  - id: b20
+    category: unsupported_jurisdiction
+    question: How does Scottish Water's leakage compare with ours?
+    critical: [comparability, fabrication]
+    expected_behaviour: Says Scotland is not covered (WICS source on hold) and gives no Scottish figure.
+    sql: |
+      SELECT status, available_in_release, hold_reason
+      FROM uk_water_performance_genie.water_performance_gold.vw_source_coverage
+      WHERE jurisdiction = 'scotland'
+
+  - id: b21
+    category: provenance
+    question: Where does our 2023-24 per capita consumption figure come from?
+    critical: [company_scope, provenance]
+    expected_behaviour: Publisher, release, record locator, checksum, asset URL and licence for the exact row.
+    sql: |
+      SELECT p.release_label, p.record_locator, p.sha256, p.asset_url, p.licence_id
+      FROM uk_water_performance_genie.water_performance_gold.vw_provenance p
+      JOIN uk_water_performance_genie.water_performance_gold.deployment_context d ON d.company_code = p.company_code
+      WHERE p.fact_type = 'reported_performance' AND p.metric_id = 'per_capita_consumption'
+        AND p.financial_year = '2023-24'
+
+  - id: b22
+    category: amp_separation
+    question: What are our PR24 performance commitment levels for leakage in 2025-30?
+    critical: [company_scope, fabrication]
+    expected_behaviour: PR24 levels only, never PR19 values. If PR24 data is not held, says so.
+    sql: |
+      SELECT financial_year, pc_name, commitment_level, unit
+      FROM uk_water_performance_genie.water_performance_gold.vw_commitment_vs_actual
+      WHERE is_configured_company AND price_review = 'PR24' AND lower(pc_name) LIKE '%leakage%'
+      ORDER BY report_year
+
+  - id: b23
+    category: peers_rank
+    question: Which company had the lowest per capita consumption in 2023-24?
+    critical: [comparability]
+    expected_behaviour: Comparable values only; lowest litres per person per day is best.
+    sql: |
+      SELECT company_name, value, unit
+      FROM uk_water_performance_genie.water_performance_gold.vw_peer_comparison
+      WHERE metric_id = 'per_capita_consumption' AND financial_year = '2023-24' AND rank_in_peer_group = 1
+
+  - id: b24
+    category: configured_company_summary
+    question: Which company is this space configured for?
+    critical: [company_scope]
+    expected_behaviour: Reads deployment_context and names the company, its code and service type.
+    sql: |
+      SELECT company_code, company_name, service_type, jurisdiction
+      FROM uk_water_performance_genie.water_performance_gold.deployment_context
