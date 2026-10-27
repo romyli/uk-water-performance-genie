@@ -19,10 +19,16 @@ Add new entries at the end; never reuse an ID.
 ## DEC-002 Company APR workbooks are on hold
 
 - **Observed:** company APR workbooks are publicly downloadable, but none registered here
-  carries a recorded reuse licence.
-- **Decision:** `COMPANY_APR` stays on hold. Stream items are used where they exist.
-- **Changes if:** a company states open reuse terms for its workbook; record them and register
-  the workbook as an asset.
+  carries a recorded reuse licence. On 27 October 2026 the six Thames Water workbooks (2020-21
+  to 2025-26) contained no licence statement, and the Thames Water website terms say "All such
+  rights are reserved" and that content may not be stored in an electronic retrieval system
+  without Thames Water's prior written consent.
+- **Decision:** `COMPANY_APR` stays on hold. The `company_apr_v1` parser is built and tested,
+  and the Thames Water workbooks are registered as assets on hold, so no workbook is retrieved.
+  Stream items are used where they exist.
+- **Changes if:** a company states open reuse terms for its workbook, or gives written consent;
+  record the terms in `sources.yml`, give each asset a `licence_verification` route and enable
+  it.
 
 ## DEC-003 Ofwat landing pages are recorded, not fetched
 

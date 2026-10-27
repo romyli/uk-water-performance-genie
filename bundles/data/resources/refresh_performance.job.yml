@@ -73,6 +73,14 @@ resources:
             python_file: ../src/tasks/run_stage.py
             parameters: [fetch, --source-id, STREAM_APR, --target, *target, --run-id, "{{job.run_id}}"]
 
+        - task_key: fetch_company_apr
+          description: Download the registered company APR workbooks (skipped while the source is on hold).
+          depends_on: [{task_key: setup}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [fetch, --source-id, COMPANY_APR, --target, *target, --run-id, "{{job.run_id}}"]
+
         - task_key: fetch_ofwat_wcpr
           description: Download the registered Ofwat Water Company Performance Report open-data assets.
           depends_on: [{task_key: setup}]
@@ -110,6 +118,7 @@ resources:
           depends_on:
             - {task_key: discover_sources}
             - {task_key: fetch_stream_apr}
+            - {task_key: fetch_company_apr}
             - {task_key: fetch_ofwat_wcpr}
             - {task_key: fetch_ofwat_pr24_outcomes}
             - {task_key: fetch_ofwat_pr19_odi}
@@ -128,6 +137,14 @@ resources:
           spark_python_task:
             python_file: ../src/tasks/run_stage.py
             parameters: [parse, --source-id, STREAM_APR, --target, *target, --run-id, "{{job.run_id}}"]
+
+        - task_key: parse_company_apr
+          description: Parse company APR workbooks into Silver, one record per table cell.
+          depends_on: [{task_key: inventory_archive}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/tasks/run_stage.py
+            parameters: [parse, --source-id, COMPANY_APR, --target, *target, --run-id, "{{job.run_id}}"]
 
         - task_key: parse_ofwat_wcpr
           description: Parse Ofwat WCPR normalised open data into Silver.
@@ -165,6 +182,7 @@ resources:
           description: Conform current, licence-verified observations to canonical company, area and year.
           depends_on:
             - {task_key: parse_stream_apr}
+            - {task_key: parse_company_apr}
             - {task_key: parse_ofwat_wcpr}
             - {task_key: parse_ofwat_pr24_outcomes}
             - {task_key: parse_ofwat_pr19_odi}

@@ -75,6 +75,8 @@ class Asset:
     supersedes: str | None = None
     licence_verification: str | None = None  # None (source-level evidence) or in_asset_statement
     hold_reason: str | None = None
+    company_code: str | None = None  # company workbooks: the company and year the asset reports
+    financial_year: str | None = None
 
 
 @dataclass(frozen=True)
@@ -159,6 +161,8 @@ def load_registry(config_dir: Path | str | None = None) -> Registry:
                 supersedes=a.get("supersedes"),
                 licence_verification=a.get("licence_verification"),
                 hold_reason=a.get("hold_reason"),
+                company_code=a.get("company_code"),
+                financial_year=None if a.get("financial_year") is None else str(a.get("financial_year")),
             )
             for a in raw.get("assets") or []
         )

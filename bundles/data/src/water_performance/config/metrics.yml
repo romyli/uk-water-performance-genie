@@ -272,6 +272,7 @@ metrics:
     synonyms: [revenue, turnover, income]
     sources:
       - {source_id: STREAM_APR, rag_reference: "1A.1", attribute: Statutory, unit: £m}
+      - {source_id: COMPANY_APR, rag_reference: "1A.1", attribute: Statutory, unit: £m}
 
   - metric_id: operating_costs_statutory
     name: Operating costs (statutory)
@@ -288,6 +289,7 @@ metrics:
     synonyms: [opex, operating costs, costs]
     sources:
       - {source_id: STREAM_APR, rag_reference: "1A.2", attribute: Statutory, unit: £m}
+      - {source_id: COMPANY_APR, rag_reference: "1A.2", attribute: Statutory, unit: £m}
 
   - metric_id: operating_profit_statutory
     name: Operating profit (statutory)
@@ -303,6 +305,7 @@ metrics:
     definition_source: RAG 4 table 1A.4, attribute Statutory
     sources:
       - {source_id: STREAM_APR, rag_reference: "1A.4", attribute: Statutory, unit: £m}
+      - {source_id: COMPANY_APR, rag_reference: "1A.4", attribute: Statutory, unit: £m}
 
   - metric_id: profit_before_tax_statutory
     name: Profit before tax (statutory)
@@ -318,6 +321,7 @@ metrics:
     definition_source: RAG 4 table 1A.11, attribute Statutory
     sources:
       - {source_id: STREAM_APR, rag_reference: "1A.11", attribute: Statutory, unit: £m}
+      - {source_id: COMPANY_APR, rag_reference: "1A.11", attribute: Statutory, unit: £m}
 
   - metric_id: dividends_statutory
     name: Dividends (statutory)
@@ -334,6 +338,7 @@ metrics:
     synonyms: [dividends paid]
     sources:
       - {source_id: STREAM_APR, rag_reference: "1A.15", attribute: Statutory, unit: £m}
+      - {source_id: COMPANY_APR, rag_reference: "1A.15", attribute: Statutory, unit: £m}
 
   - metric_id: borrowings_non_current_statutory
     name: Borrowings due after one year (statutory)
@@ -350,3 +355,4 @@ metrics:
     synonyms: [debt, long-term borrowings]
     sources:
       - {source_id: STREAM_APR, rag_reference: "1C.22", attribute: Statutory, unit: £m}
+      - {source_id: COMPANY_APR, rag_reference: "1C.22", attribute: Statutory, unit: £m}

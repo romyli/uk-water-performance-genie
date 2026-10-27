@@ -50,22 +50,74 @@ sources:
     title: Company Annual Performance Report data tables
     priority: P0
     status: hold
-    hold_reason: Publicly downloadable, but no company workbook registered here carries a recorded reuse licence. Stream copies are used where they exist.
+    hold_reason: Publicly downloadable, but no company workbook registered here carries a reuse licence. Thames Water's website terms reserve all rights and require its prior written consent before content is stored in a retrieval system. Stream copies are used where they exist.
     publisher: Each water company
     landing_page: null
     jurisdiction: england_wales
-    coverage: Company-specific Excel tables; years vary by company
+    coverage: Company-specific Excel tables on Ofwat's APR pro forma template; years vary by company
     format: Excel workbook
-    retrieval_mode: manual_bootstrap
+    retrieval_mode: direct_asset
     licence:
       id: null
-      evidence: Not recorded for any company workbook
+      evidence: Not recorded for any company workbook. Thames Water workbooks contain no licence statement, and https://www.thameswater.co.uk/legal/terms-and-conditions says "All such rights are reserved".
     attribution: null
     third_party_rights: Unknown
     reporting_basis: Financial year under the RAG 4 version stated in each workbook
     contract: company_apr_v1
     contract_version: 1
-    notes: Fallback for company/years missing from Stream. Enable a workbook only after recording its publisher's reuse terms.
+    notes: >-
+      Fallback for company/years missing from Stream. The company_apr_v1 parser reads every table by content and
+      produces records shaped like Stream's. Each workbook stays on hold until its publisher's reuse terms are
+      recorded; then set the asset's licence_verification and the source licence, and enable it.
+    assets:
+      - asset_id: tms_apr_tables_2025_26
+        release: Thames Water APR tables 2025-26
+        company_code: TMS
+        financial_year: 2025-26
+        report_year_to: 2026
+        url: https://www.thameswater.co.uk/media-library/dvrggetx/2025-26-apr-tables.xlsx
+        landing_page: https://www.thameswater.co.uk/about-us/performance/regulatory-library
+        hold_reason: No reuse licence; Thames Water's terms reserve all rights.
+      - asset_id: tms_apr_tables_2024_25
+        release: Thames Water APR tables 2024-25 (excluding tables 3A-3I)
+        company_code: TMS
+        financial_year: 2024-25
+        report_year_to: 2025
+        url: https://www.thameswater.co.uk/media-library/5s0gwt45/2024-25-annual-performance-report-tables-excluding-tables-3a-3i.xlsx
+        landing_page: https://www.thameswater.co.uk/about-us/performance/regulatory-library
+        hold_reason: No reuse licence; Thames Water's terms reserve all rights.
+      - asset_id: tms_apr_tables_2023_24
+        release: Thames Water APR tables 2023-24 (excluding tables 3A-3I, January 2025 update)
+        company_code: TMS
+        financial_year: 2023-24
+        report_year_to: 2024
+        url: https://www.thameswater.co.uk/media-library/bglculfn/2023-24-annual-performance-report-tables-excluding-tables-3a-3i-jan-25-updates.xlsx
+        landing_page: https://www.thameswater.co.uk/about-us/performance/regulatory-library
+        hold_reason: No reuse licence; Thames Water's terms reserve all rights.
+      - asset_id: tms_apr_tables_2022_23
+        release: Thames Water APR tables 2022-23 (excluding tables 3A-3I, January 2024 update)
+        company_code: TMS
+        financial_year: 2022-23
+        report_year_to: 2023
+        url: https://www.thameswater.co.uk/media-library/xvih3h42/2022-23-annual-performance-report-tables-excluding-tables-3a3iv11-updated-jan-2024.xlsx
+        landing_page: https://www.thameswater.co.uk/about-us/performance/regulatory-library
+        hold_reason: No reuse licence; Thames Water's terms reserve all rights.
+      - asset_id: tms_apr_tables_2021_22
+        release: Thames Water APR tables 2021-22 (excluding tables 3A-3I)
+        company_code: TMS
+        financial_year: 2021-22
+        report_year_to: 2022
+        url: https://www.thameswater.co.uk/media-library/srkhsr2a/2021-22-apr-tables-excluding-tables-3a-3i.xlsx
+        landing_page: https://www.thameswater.co.uk/about-us/performance/regulatory-library
+        hold_reason: No reuse licence; Thames Water's terms reserve all rights.
+      - asset_id: tms_apr_tables_2020_21
+        release: Thames Water APR tables 2020-21 (excluding tables 3A-3I)
+        company_code: TMS
+        financial_year: 2020-21
+        report_year_to: 2021
+        url: https://www.thameswater.co.uk/media-library/e0gf4m3v/2020-21-apr-tables-excluding-3a-3i.xlsx
+        landing_page: https://www.thameswater.co.uk/about-us/performance/regulatory-library
+        hold_reason: No reuse licence; Thames Water's terms reserve all rights.
 
   - source_id: OFWAT_WCPR
     title: Ofwat Water Company Performance Report open data (normalised)

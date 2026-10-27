@@ -529,6 +529,7 @@ def _mark_withdrawn(spark, target: Target, reg: registry.Registry) -> int:
 
 SILVER_FOR = {
     "STREAM_APR": "stream_apr_record",
+    "COMPANY_APR": "company_apr_record",
     "OFWAT_WCPR": "ofwat_wcpr_record",
     "OFWAT_PR19_ODI": "ofwat_pr19_pc",
     "OFWAT_PR24_OUTCOMES": "ofwat_pr24_pc",
@@ -555,7 +556,7 @@ def parse(spark, target: Target, run_id: str, source_id: str) -> dict:
     version has not parsed yet. A contract failure quarantines that version only."""
     import pandas as pd
 
-    from . import parsers, parsers_outcomes
+    from . import parsers, parsers_apr, parsers_outcomes
 
     started = utcnow()
     reg = registry.load_registry()
@@ -583,6 +584,9 @@ def parse(spark, target: Target, run_id: str, source_id: str) -> dict:
             if source_id == "STREAM_APR":
                 meta = json.loads(asset["http_metadata"] or "{}")
                 result = parsers.parse_stream(path, asset, items[asset["asset_key"]], meta.get("rag_version"))
+            elif source_id == "COMPANY_APR":
+                registered = next(a for a in reg.source(source_id).assets if a.asset_id == asset["asset_key"])
+                result = parsers_apr.parse_company_apr(path, asset, registered, companies)
             elif source_id == "OFWAT_WCPR":
                 result = parsers.parse_wcpr(path, asset, companies)
             elif source_id == "OFWAT_PR19_ODI":

@@ -56,6 +56,14 @@ SELECT s.source_id, s.company_code, s.reporting_area, s.report_year, p.financial
 FROM {silver}.stream_apr_record s
 JOIN cur ON cur.source_id = s.source_id AND cur.asset_key = s.asset_key AND cur.asset_version = s.asset_version
 JOIN cfg_dim_period p ON p.report_year = s.report_year
+UNION ALL
+SELECT c.source_id, c.company_code, c.reporting_area, c.report_year, p.financial_year, c.item_reference,
+       c.rag_reference, c.line_description, c.attribute, c.attribute_financial_year, c.value, c.units,
+       c.decimal_places, CAST(NULL AS DOUBLE), c.asset_key, c.asset_version, c.sha256, c.release_label,
+       c.record_locator, c.parser_version, c.rag_version
+FROM {silver}.company_apr_record c
+JOIN cur ON cur.source_id = c.source_id AND cur.asset_key = c.asset_key AND cur.asset_version = c.asset_version
+JOIN cfg_dim_period p ON p.report_year = c.report_year
 """
 
 # One row per published value. WCPR releases overlap (each repeats earlier years), so conform keeps the

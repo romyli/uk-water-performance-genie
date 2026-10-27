@@ -43,7 +43,7 @@ stated reuse terms, can be linked and cited but is never loaded as data.
 | `OFWAT_PR24_OUTCOMES` | conditional | OGL v3.0 when stated in the asset | Landing page cannot be read automatically |
 | `OFWAT_PR19_ODI` | conditional | OGL v3.0 when stated in the asset | Landing page cannot be read automatically |
 | `RAG_DEFINITIONS` | conditional | OGL v3.0 when stated in the document | Reference metadata, not observations |
-| `COMPANY_APR` | hold | not recorded | No company workbook has recorded reuse terms |
+| `COMPANY_APR` | hold | not recorded | Parser built; no company workbook has recorded reuse terms (Thames Water's terms reserve all rights) |
 | P1 and P2 sources | hold | see [sources.md](../sources.md) | Bulk access, schema or licence not yet confirmed |
 
 The decisions behind these statuses are in [data-issues-and-decisions.md](data-issues-and-decisions.md).
