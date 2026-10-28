@@ -385,6 +385,31 @@ How to read the result:
 - No credentials are stored: all sources are public and need no keys. The repository contains no
   workspace hosts, warehouse IDs or user names.
 
+### Sharing a development deployment
+
+The `dev` target grants nothing. The person who deploys it owns the schemas it creates, so the
+space works for them and nobody else. Genie runs every query as the person asking, so anyone
+you share a dev space with (and anyone who runs its benchmarks) needs their own access to the
+Gold schema. Otherwise each question fails with `INSUFFICIENT_PERMISSIONS ... does not have USE
+CATALOG on Catalog`. Dev schemas are prefixed with the target and your user name, for example
+`dev_jane_doe_water_performance_gold`. The deployment summary and `databricks bundle summary -t
+dev` show the exact name.
+
+A catalog owner or administrator runs this once per colleague or group:
+
+```sql
+GRANT USE CATALOG ON CATALOG <catalog> TO `<user or group>`;
+GRANT USE SCHEMA, SELECT ON SCHEMA <catalog>.<dev gold schema> TO `<user or group>`;
+```
+
+Then share the space with them (**Share** in the space, **Can run**), and give them **Can use**
+on the space's SQL warehouse. `SELECT` on the schema covers every Gold view and the Metric View,
+including ones added later. They need nothing on the ops, Silver or landing schemas.
+
+The `prod` target grants schema access and **Can run** to `analyst_group` and `data_owner_group`
+itself. `USE CATALOG` is always granted by hand (step 2 of the deployment), because the catalog
+is not a bundle resource.
+
 ### Costs and compute
 
 Jobs use serverless compute and are billed per run. A refresh with no source changes uses a few

@@ -38,6 +38,7 @@
 
 | Symptom | Fix |
 |---|---|
+| Questions or benchmarks fail with `INSUFFICIENT_PERMISSIONS ... does not have USE CATALOG` | Genie runs queries as the person asking. Grant them `USE CATALOG` on the catalog and `USE SCHEMA, SELECT` on the Gold schema; the `dev` target grants neither ([Sharing a development deployment](../README.md#sharing-a-development-deployment)). If the person already has access (check `databricks grants get-effective catalog <catalog> --principal <user>`) and chat questions work but benchmark runs still fail this way, grants will not fix it: the benchmark's ground-truth query is being refused. Report it to Databricks support with a failed statement ID from the benchmark result and a working chat statement ID |
 | Genie answers for the wrong company | Check `SELECT * FROM <catalog>.water_performance_gold.deployment_context`. If it is wrong, fix `company_code`, redeploy the data bundle and refresh |
 | Genie says data is not available when you expect it | Query `vw_source_coverage` for the source; check the year and company exist in `vw_reported_performance` |
 | Genie ranks something it should not | Report it as a critical benchmark failure; check `is_comparable` and `comparability_reason` for the rows it used |
