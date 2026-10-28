@@ -96,19 +96,35 @@ Ml/d, which depends on network size); it explains why and offers a comparable me
 | Source | Status | What it provides | Licence |
 |---|---|---|---|
 | `OFWAT_WCPR` | Enabled | Ofwat Water Company Performance Report open data: comparable performance measures for every company, mostly from 2019-20 (some from 2017-18) to 2024-25 | Open Government Licence v3.0 |
-| `STREAM_APR` | Enabled | Each participating company's standardised Annual Performance Report tables, 2023-24 to 2025-26, including statutory finance | CC BY 4.0, checked per item |
+| `STREAM_APR` | Enabled | Each participating company's standardised Annual Performance Report tables, 2023-24 to 2025-26, including statutory finance | CC BY 4.0, checked per item; one item loaded without an open licence (see below) |
+| `COMPANY_APR` | Conditional | Thames Water's own APR tables, 2020-21 to 2025-26, including statutory finance, read from its published workbooks | **No open licence**: loaded by operator decision (see below) |
 | `OFWAT_PR19_ODI` | Conditional | PR19 (2020-25) commitment levels, actuals, whether each was met, and ODI payments | Open Government Licence v3.0, verified in each workbook |
 | `OFWAT_PR24_OUTCOMES` | Conditional | PR24 (2025-30) performance commitment levels | Open Government Licence v3.0, once verified |
 | `RAG_DEFINITIONS` | Conditional | Ofwat's RAG 4 definitions of the APR tables, as a citable document | Open Government Licence v3.0, verified in the document |
-| `COMPANY_APR`, `EA_EPA`, `EA_EDM`, `DWI_COMPANY`, `CCW_COMPLAINTS`, `COMPANY_BOUNDARIES` | On hold | Not loaded until bulk access, schema and reuse terms are confirmed | See the register |
+| `EA_EPA`, `EA_EDM`, `DWI_COMPANY`, `CCW_COMPLAINTS`, `COMPANY_BOUNDARIES` | On hold | Not loaded until bulk access, schema and reuse terms are confirmed | See the register |
 
 A **conditional** source is loaded only when a licence statement is found inside the asset or an
 operator records it (see [Routine operations](#routine-operations)). The full register, with exact
 URLs, coverage notes and the reasons for each hold, is in [sources.md](sources.md). How
 sources are accepted and versioned is in [docs/source-audit.md](docs/source-audit.md).
 
-Known coverage gaps: Thames Water does not publish its APR tables on Stream, so Thames finance
-lines are not available; Southern Water's 2024-25 Stream item has no open licence.
+### Data loaded without an open licence
+
+Two datasets are loaded although they carry no open licence. This was a deliberate operator
+decision, recorded in [DEC-009](docs/data-issues-and-decisions.md#dec-009-two-datasets-are-loaded-without-an-open-licence).
+Before you share Genie answers or Gold data outside your organisation, check with your legal or
+data-licensing team, or remove the two overrides described below.
+
+| Dataset | Licence position | How it is loaded |
+|---|---|---|
+| Thames Water APR tables, 2020-21 to 2025-26 (`COMPANY_APR`) | The workbooks state no licence. Thames Water's [website terms](https://www.thameswater.co.uk/legal/terms-and-conditions) say "All such rights are reserved" and that content may not be stored in an electronic retrieval system without its prior written consent. | Downloaded from Thames Water's [regulatory library](https://www.thameswater.co.uk/about-us/performance/regulatory-library); each asset has `licence_verification: operator_override` in `sources.yml` |
+| Southern Water APR 2024-25 on Stream (`STREAM_APR`) | The Stream item's licence is "N/A" (custom), not CC BY 4.0. Southern Water's 2023-24 and 2025-26 items are CC BY 4.0. | The item has a `licence_override` reason in `stream_apr_items.yml` |
+
+Every value loaded this way has `licence_id = 'NO-OPEN-LICENCE'` in `vw_reported_performance`,
+`vw_provenance` and `source_attribution`, with the reason in `licence_evidence`. To stop loading
+either dataset, set the Thames assets (or the source) to `status: hold` with a `hold_reason`, or
+replace the Southern item's `licence_override` with `status: hold` and a `hold_reason`, then
+redeploy and refresh. The next release withdraws the data.
 
 ## Before you start
 

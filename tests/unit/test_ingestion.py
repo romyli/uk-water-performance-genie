@@ -104,6 +104,32 @@ def test_stream_item_without_cc_by_licence_is_rejected_and_not_downloaded(artifa
     assert out.outcome == "licence_rejected" and fake.queries == 0
 
 
+def test_stream_item_with_a_licence_override_is_downloaded_and_records_why(artifact_dir):
+    import dataclasses
+
+    t = FakeTransport()
+    fake = FakeArcGIS(stream_records(2), licence_html="<p>N/A</p>").install(t, "0" * 32, SERVICE)
+    item = dataclasses.replace(_item(), licence_override="Loaded by operator decision.")
+    out = acquire.fetch_stream_item(client(t), _registry(), item, str(artifact_dir), "run1", None)
+    assert out.outcome == "fetched" and fake.queries > 0
+    assert out.metadata["licence_override"] == "Loaded by operator decision." and out.metadata["licence_id"] is None
+
+
+def test_overridden_versions_record_no_open_licence():
+    from water_performance import tasks
+
+    reg = _registry()
+    lic, evidence, ok = tasks._licence(
+        reg.source("STREAM_APR"), None, {"licence_override": "operator decision", "licence_text": "N/A"}
+    )
+    assert (lic, ok) == (registry.OVERRIDE_LICENCE, True) and "operator decision" in evidence and "'N/A'" in evidence
+    src = reg.source("COMPANY_APR")
+    lic, evidence, ok = tasks._licence(src, src.assets[0], {})
+    assert (lic, ok) == (registry.OVERRIDE_LICENCE, True) and evidence.startswith("Operator licence override")
+    # Without an override, a Stream item that is not CC BY 4.0 is still not verified.
+    assert tasks._licence(reg.source("STREAM_APR"), None, {"licence_id": None})[2] is False
+
+
 def test_stream_unchanged_metadata_skips_the_download(artifact_dir):
     t = FakeTransport()
     fake = FakeArcGIS(stream_records(3)).install(t, "0" * 32, SERVICE)

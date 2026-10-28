@@ -94,7 +94,7 @@ def _latest_manifest(spark, target: Target, source_id: str) -> dict[str, dict]:
         SELECT asset_key, asset_version, sha256, api_record_count, status,
                date_format(api_item_modified, "yyyy-MM-dd'T'HH:mm:ssXXX") AS item_modified,
                date_format(api_data_last_edit, "yyyy-MM-dd'T'HH:mm:ssXXX") AS data_last_edit
-        FROM {target.table('ops', 'asset_manifest')}
+        FROM {target.table("ops", "asset_manifest")}
         WHERE source_id = '{source_id}' AND status = 'current'""",
     )
     return {r["asset_key"]: r for r in rows}
@@ -174,7 +174,7 @@ def _manifest_versions(spark, target: Target) -> dict[tuple[str, str], list[dict
     out: dict[tuple[str, str], list[dict]] = {}
     for r in store.rows(
         spark,
-        f"SELECT source_id, asset_key, asset_version, sha256, status " f"FROM {target.table('ops', 'asset_manifest')}",
+        f"SELECT source_id, asset_key, asset_version, sha256, status FROM {target.table('ops', 'asset_manifest')}",
     ):
         out.setdefault((r["source_id"], r["asset_key"]), []).append(r)
     return out
@@ -349,6 +349,8 @@ def inventory(spark, target: Target, run_id: str) -> dict:
 
 def _licence(src, asset, meta):
     """(licence_id, evidence, verified). verified=None means 'look inside the asset'."""
+    if src.source_id == "STREAM_APR" and meta.get("licence_override"):
+        return registry.OVERRIDE_LICENCE, _override_evidence(meta["licence_override"], meta.get("licence_text")), True
     if src.source_id == "STREAM_APR":
         return meta.get("licence_id"), meta.get("licence_text"), meta.get("licence_id") == "CC-BY-4.0"
     if meta.get("supplied_by"):  # manual bootstrap: the operator recorded the landing-page licence
@@ -357,7 +359,14 @@ def _licence(src, asset, meta):
         return None, None, None
     if asset is not None and asset.licence_verification == "operator_confirmed":
         return src.licence_id, (src.get("licence") or {}).get("evidence"), True
+    if asset is not None and asset.licence_verification == "operator_override":
+        return registry.OVERRIDE_LICENCE, _override_evidence((src.get("licence") or {}).get("evidence"), None), True
     return src.licence_id, (src.get("licence") or {}).get("evidence"), src.status == "enabled"
+
+
+def _override_evidence(reason: str | None, publisher_text: str | None) -> str:
+    text = f"Operator licence override (no open licence): {reason or 'reason not recorded'}"
+    return f"{text} Publisher licence text: {publisher_text!r}" if publisher_text is not None else text
 
 
 def _manifest_row(
@@ -470,6 +479,9 @@ def _reverify_licences(spark, target: Target, reg: registry.Registry, run_id: st
             continue
         if asset.licence_verification == "operator_confirmed":
             lic_id, statement, locator = src.licence_id, (src.get("licence") or {}).get("evidence"), "registry"
+        elif asset.licence_verification == "operator_override":
+            lic_id, locator = registry.OVERRIDE_LICENCE, "registry"
+            statement = _override_evidence((src.get("licence") or {}).get("evidence"), None)
         else:
             lic_id, statement, locator = assets.find_licence_statement(h["archive_path"], h["file_name"])
         ok = lic_id is not None and lic_id == src.licence_id
@@ -542,10 +554,10 @@ def _parsable(spark, target: Target, source_id: str) -> list[dict]:
         spark,
         f"""
         SELECT m.*, p.status AS parsed_status, p.parser_version AS parsed_with
-        FROM {target.table('ops', 'asset_manifest')} m
+        FROM {target.table("ops", "asset_manifest")} m
         LEFT JOIN (SELECT asset_key, asset_version, status, parser_version,
                           row_number() OVER (PARTITION BY asset_key, asset_version ORDER BY parsed_at DESC) rn
-                   FROM {target.table('ops', 'parse_log')} WHERE source_id = '{source_id}') p
+                   FROM {target.table("ops", "parse_log")} WHERE source_id = '{source_id}') p
           ON p.asset_key = m.asset_key AND p.asset_version = m.asset_version AND p.rn = 1
         WHERE m.source_id = '{source_id}' AND m.status = 'current' AND m.licence_verified""",
     )
@@ -736,7 +748,7 @@ def _config_views(spark, target: Target) -> None:
         spark,
         "cfg_stream_item",
         items,
-        "item_id STRING, company_code STRING, financial_year STRING, " "company_name STRING",
+        "item_id STRING, company_code STRING, financial_year STRING, company_name STRING",
     )
 
 
@@ -802,8 +814,7 @@ def conform(spark, target: Target, run_id: str) -> dict:
         r["source_id"]: r["n"]
         for r in store.rows(
             spark,
-            f"SELECT source_id, count(*) n FROM "
-            f"{target.table('silver', 'conformed_observation')} GROUP BY source_id",
+            f"SELECT source_id, count(*) n FROM {target.table('silver', 'conformed_observation')} GROUP BY source_id",
         )
     }
     store.record_stage(spark, target, run_id, "conform", "succeeded", started, None, json.dumps(counts), counts)
@@ -835,13 +846,21 @@ def publish(spark, target: Target, run_id: str) -> dict:
         "fact_performance_commitment": _fmt(gold_build.COMMITMENT_INSERT, target, current=current, release=release),
         "fact_odi": _fmt(gold_build.ODI_INSERT, target, current=current, release=release),
         "reconciliation": _fmt(gold_build.RECONCILIATION_INSERT, target, release=release),
-        "source_attribution": _fmt(gold_build.ATTRIBUTION_INSERT, target, release=release),
+        "source_attribution": _fmt(
+            gold_build.ATTRIBUTION_INSERT,
+            target,
+            release=release,
+            override_name=sql_literal(registry.load_registry().licences[registry.OVERRIDE_LICENCE]["name"]),
+            override_note=sql_literal(
+                "Not openly licensed: loaded by operator decision without the publisher's permission to reuse it."
+            ),
+        ),
     }
     counts = {}
     for name, sql in statements.items():
         spark.sql(sql)
         counts[name] = spark.sql(
-            f"SELECT count(*) n FROM {target.table('silver', 'release_' + name)} " f"WHERE release_id = '{release}'"
+            f"SELECT count(*) n FROM {target.table('silver', 'release_' + name)} WHERE release_id = '{release}'"
         ).collect()[0]["n"]
     spark.sql(f"DELETE FROM {target.table('ops', 'release')} WHERE release_id = '{release}'")  # a retried task
     store.append(
@@ -919,7 +938,7 @@ def quality_checks(spark, target: Target, release: str) -> list[dict]:
         dupes = one(f"SELECT count(*) FROM (SELECT {key} FROM {s(name)} WHERE {r} GROUP BY {key} HAVING count(*) > 1)")
         check(f"grain_{name}", "blocking", name, dupes, 0, dupes == 0, f"{key} is unique.")
     for name in ("fact_reported_performance", "fact_performance_commitment", "fact_odi"):
-        orphan = one(f"""SELECT count(*) FROM {s(name)} f LEFT JOIN {target.table('ops', 'asset_manifest')} m
+        orphan = one(f"""SELECT count(*) FROM {s(name)} f LEFT JOIN {target.table("ops", "asset_manifest")} m
                          ON m.source_id = f.source_id AND m.asset_key = f.asset_key AND m.asset_version = f.asset_version
                          WHERE f.{r} AND (m.sha256 IS NULL OR NOT m.licence_verified OR m.licence_id IS NULL
                                OR f.record_locator IS NULL OR f.sha256 <> m.sha256)""")
@@ -932,7 +951,7 @@ def quality_checks(spark, target: Target, release: str) -> list[dict]:
             orphan == 0,
             "Every row joins a licence-verified manifest version with matching checksum and a record locator.",
         )
-    bad = one(f"""SELECT count(*) FROM {s('fact_reported_performance')} f LEFT JOIN {s('dim_metric')} m
+    bad = one(f"""SELECT count(*) FROM {s("fact_reported_performance")} f LEFT JOIN {s("dim_metric")} m
                   ON m.metric_id = f.metric_id AND m.release_id = f.release_id
                   WHERE f.{r} AND f.is_comparable AND (m.metric_id IS NULL OR m.comparability_status <> 'comparable'
                         OR f.unit IS NULL OR f.price_base IS NULL OR f.reporting_area <> 'whole_company')""")
@@ -945,7 +964,7 @@ def quality_checks(spark, target: Target, release: str) -> list[dict]:
         bad == 0,
         "Comparable rows have an approved metric, unit, price base and whole-company scope.",
     )
-    multi = one(f"""SELECT count(*) FROM (SELECT metric_id, company_code, report_year FROM {s('fact_reported_performance')}
+    multi = one(f"""SELECT count(*) FROM (SELECT metric_id, company_code, report_year FROM {s("fact_reported_performance")}
                     WHERE {r} AND is_comparable AND is_preferred_source GROUP BY 1, 2, 3 HAVING count(*) > 1)""")
     check(
         "one_preferred_value",
@@ -956,7 +975,7 @@ def quality_checks(spark, target: Target, release: str) -> list[dict]:
         multi == 0,
         "At most one preferred comparable value per metric, company and year.",
     )
-    wrong_amp = one(f"""SELECT count(*) FROM {s('fact_performance_commitment')} WHERE {r} AND
+    wrong_amp = one(f"""SELECT count(*) FROM {s("fact_performance_commitment")} WHERE {r} AND
                         ((price_review = 'PR19' AND report_year NOT BETWEEN 2021 AND 2025)
                          OR (price_review = 'PR24' AND report_year NOT BETWEEN 2026 AND 2030))""")
     check(
@@ -1173,7 +1192,7 @@ def _apply_retention(spark, target: Target, keep: int) -> None:
         for r in store.rows(
             spark,
             f"""
-        SELECT release_id FROM {target.table('ops', 'release')} WHERE status IN ('published', 'superseded')
+        SELECT release_id FROM {target.table("ops", "release")} WHERE status IN ('published', 'superseded')
         ORDER BY published_at DESC NULLS LAST LIMIT {int(keep)}""",
         )
     ]

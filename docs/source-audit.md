@@ -43,7 +43,7 @@ stated reuse terms, can be linked and cited but is never loaded as data.
 | `OFWAT_PR24_OUTCOMES` | conditional | OGL v3.0 when stated in the asset | Landing page cannot be read automatically |
 | `OFWAT_PR19_ODI` | conditional | OGL v3.0 when stated in the asset | Landing page cannot be read automatically |
 | `RAG_DEFINITIONS` | conditional | OGL v3.0 when stated in the document | Reference metadata, not observations |
-| `COMPANY_APR` | hold | not recorded | Parser built; no company workbook has recorded reuse terms (Thames Water's terms reserve all rights) |
+| `COMPANY_APR` | conditional | `NO-OPEN-LICENCE` | Thames Water workbooks loaded by operator licence override (DEC-009); the publisher reserves all rights |
 | P1 and P2 sources | hold | see [sources.md](../sources.md) | Bulk access, schema or licence not yet confirmed |
 
 The decisions behind these statuses are in [data-issues-and-decisions.md](data-issues-and-decisions.md).
@@ -151,9 +151,10 @@ the one above.
 
 ## Coverage gaps
 
-- Thames Water has no Stream APR item. Its detailed APR tables are not available until a company
-  workbook with recorded reuse terms is registered; its WCPR and Ofwat outcome data are available.
-- Southern Water 2024-25 APR data is not loaded (licence "N/A" on the Stream item).
+- Thames Water has no Stream APR item. Its detailed APR tables come from its own workbooks,
+  loaded without an open licence (DEC-009).
+- Southern Water 2024-25 APR data is loaded without an open licence (licence "N/A" on the Stream
+  item; DEC-009).
 - Stream items start in 2023-24. Earlier detailed APR tables need company workbooks.
 - Environment Agency, Drinking Water Inspectorate, CCW and boundary data are on hold.
 - Scotland and Northern Ireland are not covered.

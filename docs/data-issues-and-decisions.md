@@ -12,8 +12,9 @@ Add new entries at the end; never reuse an ID.
   The Southern Water 2024-25 item (`ccd2a005a25e457caa6b85b929ebe9c3`) states "N/A", and a
   South Staffs Water 2024-25 CSV item (`0690221de5774c33bab091608c03463a`) states no licence.
 - **Decision:** every retrieval reads the item's licence text and ingests the item only if it
-  links to or names CC BY 4.0. Both items above are registered with status `hold`. South Staffs
-  2024-25 is covered by its CC BY 4.0 Feature Service item.
+  links to or names CC BY 4.0, or the item records a `licence_override` (DEC-009). The South
+  Staffs CSV item is on hold; South Staffs 2024-25 is covered by its CC BY 4.0 Feature Service
+  item. The Southern Water item is loaded under DEC-009.
 - **Changes if:** Southern Water republishes 2024-25 under an open licence.
 
 ## DEC-002 Company APR workbooks are on hold
@@ -23,12 +24,11 @@ Add new entries at the end; never reuse an ID.
   to 2025-26) contained no licence statement, and the Thames Water website terms say "All such
   rights are reserved" and that content may not be stored in an electronic retrieval system
   without Thames Water's prior written consent.
-- **Decision:** `COMPANY_APR` stays on hold. The `company_apr_v1` parser is built and tested,
-  and the Thames Water workbooks are registered as assets on hold, so no workbook is retrieved.
-  Stream items are used where they exist.
+- **Decision:** company workbooks are not loaded unless their reuse terms are recorded, with one
+  exception: the Thames Water workbooks, loaded by operator decision (DEC-009). Stream items are
+  used where they exist.
 - **Changes if:** a company states open reuse terms for its workbook, or gives written consent;
-  record the terms in `sources.yml`, give each asset a `licence_verification` route and enable
-  it.
+  record the terms in `sources.yml` and replace the override with a `licence_verification` route.
 
 ## DEC-003 Ofwat landing pages are recorded, not fetched
 
@@ -71,3 +71,19 @@ Add new entries at the end; never reuse an ID.
 
 - **Decision:** `WICS_RETURN` and `NI_AIR` are on hold until separate adapters exist. Ofwat
   parsers never read them and Genie must say these jurisdictions are not covered.
+
+## DEC-009 Two datasets are loaded without an open licence
+
+- **Observed (27 October 2026):** Thames Water has no Stream APR item, and its own APR workbooks
+  state no licence; its website terms reserve all rights and require prior written consent before
+  content is stored in an electronic retrieval system. The Southern Water 2024-25 Stream item's
+  licence is "N/A" (DEC-001).
+- **Decision:** the operator chose to load both, so that Thames Water finance (including
+  non-appointed profit) and Southern Water 2024-25 are available. The registry records each as an
+  operator licence override: `licence_verification: operator_override` on the six Thames assets
+  (source licence `NO-OPEN-LICENCE`) and `licence_override` on the Southern item. Every version
+  loaded this way records `licence_id = 'NO-OPEN-LICENCE'` and the reason in `licence_evidence`,
+  and Gold shows that licence on each value.
+- **Changes if:** Thames Water gives consent or states open terms, or Southern Water relicenses
+  the item as CC BY 4.0 (then remove the override), or the operator withdraws the decision (set
+  the assets or item to `hold`).

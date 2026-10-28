@@ -265,8 +265,8 @@ items:
     item_type: feature_service
     service_url: https://services-eu1.arcgis.com/XxS6FebPX29TRGDJ/arcgis/rest/services/Southern_Water_Annual_Performance_Report_2024_2025_feature/FeatureServer
     layer_id: 0
-    status: hold
-    hold_reason: 'Item licence is "N/A" (custom), not CC BY 4.0.'
+    status: enabled
+    licence_override: 'Item licence is "N/A" (custom), not CC BY 4.0; loaded by operator decision (the 2023-24 and 2025-26 items are CC BY 4.0).'
   - item_id: 59278ef8d3a44174a61b9be3d75c693c
     title: "Southern Water Annual Performance Report 2025_26"
     company_code: SRN

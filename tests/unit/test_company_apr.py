@@ -124,9 +124,9 @@ def test_workbook_without_apr_tables_fails_the_contract(artifact_dir):
         _parse(path)
 
 
-def test_registered_company_workbooks_are_held_until_reuse_terms_are_recorded():
+def test_registered_company_workbooks_are_loaded_only_through_the_licence_override():
     src = registry.load_registry().source("COMPANY_APR")
-    assert src.status == "hold" and src.assets
+    assert src.status == "conditional" and src.licence_id == registry.OVERRIDE_LICENCE and src.assets
     for a in src.assets:
-        assert a.status == "hold" and a.hold_reason and a.company_code in COMPANIES
+        assert a.licence_verification == "operator_override" and a.company_code in COMPANIES
         assert a.financial_year and a.report_year_to == int("20" + a.financial_year[-2:])

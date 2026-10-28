@@ -22,6 +22,11 @@ JURISDICTIONS = ("england_wales", "england", "wales", "scotland", "northern_irel
 # The first release supports one jurisdiction model. Others need their own adapters.
 SUPPORTED_JURISDICTIONS = ("england_wales", "england", "wales")
 
+# Licence verification routes for an asset. operator_override loads an asset that has no open
+# licence, at the operator's decision; every version loaded that way records OVERRIDE_LICENCE.
+LICENCE_VERIFICATION = (None, "in_asset_statement", "operator_confirmed", "operator_override")
+OVERRIDE_LICENCE = "NO-OPEN-LICENCE"
+
 REQUIRED_FOR_ENABLED = (
     "source_id",
     "publisher",
@@ -73,7 +78,7 @@ class Asset:
     published: str | None = None
     report_year_to: int | None = None
     supersedes: str | None = None
-    licence_verification: str | None = None  # None (source-level evidence) or in_asset_statement
+    licence_verification: str | None = None  # one of LICENCE_VERIFICATION
     hold_reason: str | None = None
     company_code: str | None = None  # company workbooks: the company and year the asset reports
     financial_year: str | None = None
@@ -113,6 +118,7 @@ class StreamItem:
     service_url: str | None = None
     layer_id: int | None = None
     hold_reason: str | None = None
+    licence_override: str | None = None  # why an item without CC BY 4.0 is loaded anyway
 
 
 @dataclass(frozen=True)
@@ -180,6 +186,7 @@ def load_registry(config_dir: Path | str | None = None) -> Registry:
             service_url=i.get("service_url"),
             layer_id=i.get("layer_id"),
             hold_reason=i.get("hold_reason"),
+            licence_override=i.get("licence_override"),
         )
         for i in items_doc.get("items") or []
     )
@@ -199,7 +206,7 @@ def gate_failures(source: Source, licences: dict) -> list[str]:
     lic_id = lic.get("id")
     if lic_id not in licences:
         problems.append(f"licence {lic_id!r} is not a recognised open licence")
-    elif (licences[lic_id] or {}).get("redistribution") != "allowed_with_attribution":
+    elif (licences[lic_id] or {}).get("redistribution") != "allowed_with_attribution" and not overridden_only(source):
         problems.append(f"licence {lic_id!r} does not allow redistribution")
     if not lic.get("evidence"):
         problems.append("licence evidence is not recorded")
@@ -214,6 +221,12 @@ def gate_failures(source: Source, licences: dict) -> list[str]:
             if not getattr(a, key):
                 problems.append(f"asset {a.asset_id}: {key} is not recorded")
     return problems
+
+
+def overridden_only(source: Source) -> bool:
+    """Every asset that may be loaded goes through the operator licence override."""
+    live = [a for a in source.assets if a.status != "hold"]
+    return bool(live) and all(a.licence_verification == "operator_override" for a in live)
 
 
 def validate_registry(reg: Registry) -> None:
@@ -237,8 +250,14 @@ def validate_registry(reg: Registry) -> None:
                 errors.append(f"{s.source_id}/{a.asset_id}: conditional assets need licence_verification")
             if a.status == "hold" and not a.hold_reason:
                 errors.append(f"{s.source_id}/{a.asset_id}: assets on hold must state hold_reason")
-            if a.licence_verification not in (None, "in_asset_statement", "operator_confirmed"):
+            if a.licence_verification not in LICENCE_VERIFICATION:
                 errors.append(f"{s.source_id}/{a.asset_id}: unknown licence_verification {a.licence_verification!r}")
+            if a.licence_verification == "operator_override" and s.licence_id != OVERRIDE_LICENCE:
+                errors.append(
+                    f"{s.source_id}/{a.asset_id}: operator_override assets need licence id {OVERRIDE_LICENCE}"
+                )
+            if s.source_id == "COMPANY_APR" and a.status != "hold" and (not a.company_code or not a.financial_year):
+                errors.append(f"{s.source_id}/{a.asset_id}: company workbooks need company_code and financial_year")
     seen = set()
     for i in reg.stream_items:
         if i.item_id in seen:
@@ -250,6 +269,8 @@ def validate_registry(reg: Registry) -> None:
             errors.append(f"stream item {i.item_id}: status {i.status!r}")
         if i.status == "hold" and not i.hold_reason:
             errors.append(f"stream item {i.item_id}: hold needs hold_reason")
+        if i.licence_override is not None and (i.status != "enabled" or not i.licence_override.strip()):
+            errors.append(f"stream item {i.item_id}: licence_override needs status enabled and a stated reason")
         if i.item_type == "feature_service" and (not i.service_url or i.layer_id is None):
             errors.append(f"stream item {i.item_id}: feature_service items need service_url and layer_id")
         if i.reporting_area not in REPORTING_AREAS:
