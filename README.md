@@ -106,7 +106,10 @@ Ml/d, which depends on network size); it explains why and offers a comparable me
 A **conditional** source is loaded only when a licence statement is found inside the asset or an
 operator records it (see [Routine operations](#routine-operations)). The full register, with exact
 URLs, coverage notes and the reasons for each hold, is in [sources.md](sources.md). How
-sources are accepted and versioned is in [docs/source-audit.md](docs/source-audit.md).
+sources are accepted and versioned is in [docs/source-audit.md](docs/source-audit.md). Every URL
+the pipeline downloads, and the parser that reads it, is listed in
+[docs/source-urls.csv](docs/source-urls.csv). To load the files with your own tools, follow
+[docs/bronze-ingestion-guide.md](docs/bronze-ingestion-guide.md).
 
 ### Data loaded without an open licence
 
