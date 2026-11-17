@@ -228,3 +228,64 @@ def save_workbook(wb, path):
         wb.save(local)
         shutil.copyfile(local, path)
     return path
+
+
+def _put(ws, row, cells: dict) -> None:
+    """Write {zero-based column: value} into one 1-based worksheet row."""
+    for col, value in cells.items():
+        ws.cell(row=row, column=col + 1, value=value)
+
+
+def write_company_apr_xlsx(path, company="Thames Water", year_end=2025, duplicate_heading=False, second_unit="000s"):
+    """A company APR workbook on Ofwat's pro forma template: a cover sheet, an income statement with
+    merged headings and an Ofwat Bon Numbers grid, a table whose units and DPs are header rows, a
+    table that changes its headings part-way down, and a debt-instrument register."""
+    import openpyxl
+
+    wb = openpyxl.Workbook()
+    cover = wb.active
+    cover.title = "Cover"
+    cover["B2"] = f"{year_end - 1}-{str(year_end)[-2:]} APR tables"
+
+    ws = wb.create_sheet("1A")
+    _put(ws, 1, {1: "Pro forma 1A", 23: "Ofwat Bon Numbers"})
+    _put(ws, 2, {1: company})
+    _put(ws, 3, {1: f"Income statement for the 12 months ended 31 March {year_end}"})
+    _put(ws, 5, {1: "Line description", 3: "Units", 4: "DPs", 5: "Statutory", 6: "Adjustments"})
+    _put(ws, 5, {9: "Total appointed activities", 11: "RAG 4 reference", 13: "Comments (For internal use only)"})
+    _put(ws, 5, {23: "Line description", 25: "Statutory", 26: "Adjustments", 29: "Total appointed activities"})
+    subs = ("Differences between statutory and RAG definitions", "Non-appointed", "Total adjustments")
+    _put(ws, 6, {0: "Header", 6: subs[0], 7: subs[1], 8: subs[2], 26: subs[0], 27: subs[1], 28: subs[2]})
+    _put(ws, 7, {0: "Start_Data", 25: "Start_Bon"})
+    _put(ws, 8, {1: "Revenue", 3: "£m", 4: 3, 5: 2738.2, 6: 40.043, 7: 157.162, 8: -117.119, 9: 2621.081})
+    _put(ws, 8, {11: "1A.1", 13: "not a value", 23: "Revenue", 25: "BO1180STAT", 26: "BO1180DSR"})
+    _put(ws, 8, {27: "BO1180NA", 28: "BO1180ADJ", 29: "BO1180"})
+    _put(ws, 9, {1: "Operating profit", 3: "£m", 4: 3, 5: -799.3, 6: "#REF!", 7: -1123.461, 9: 208.506})
+    _put(ws, 9, {11: "1A.4", 23: "Operating profit", 25: "BO2060STAT", 26: "Copy", 27: "BO2060NA", 29: "BO2060"})
+
+    rr = wb.create_sheet("2F")
+    _put(rr, 1, {1: "Pro forma 2F"})
+    _put(rr, 2, {1: company})
+    _put(rr, 3, {1: f"Residential retail for the 12 months ended 31 March {year_end}"})
+    heading = "Revenue" if duplicate_heading else "Number of customers"
+    _put(rr, 5, {1: "Line description", 2: "Revenue", 3: heading, 6: "RAG 4 reference"})
+    _put(rr, 6, {1: "Units", 2: "£m", 3: second_unit})
+    _put(rr, 7, {1: "DPs", 2: 3, 3: 3})
+    _put(rr, 9, {1: "Residential revenue", 2: 1500.25, 3: 6000.5, 6: "2F.1"})
+
+    cp = wb.create_sheet("4R")
+    _put(cp, 1, {1: "Pro forma 4R"})
+    _put(cp, 2, {1: company})
+    _put(cp, 5, {1: "Line description", 2: "Units", 3: "DPs", 4: "Measured", 5: "Total", 7: "RAG 4 reference"})
+    _put(cp, 7, {1: "Residential water only customers", 2: "000s", 3: 3, 4: 26.449, 5: 50.887, 7: "4R.1"})
+    _put(cp, 9, {4: "Water", 6: "Wastewater"})
+    _put(cp, 10, {4: "Measured", 5: "Total", 6: "Measured"})
+    _put(cp, 11, {1: "Connected properties", 2: "000s", 3: 3, 4: 3000.1, 5: 4000.2, 6: 2500.3, 7: "4R.10"})
+
+    debt = wb.create_sheet("4B")
+    _put(debt, 1, {1: "Pro forma 4B"})
+    _put(debt, 2, {1: company})
+    _put(debt, 5, {1: "Line description", 2: "Units", 3: "DPs", 4: "Instrument identifier (e.g. ISIN)"})
+    _put(debt, 5, {6: "RAG 4 reference"})
+    _put(debt, 7, {1: "Bond 1", 2: "£m", 3: 3, 4: 12.5, 6: "4B.1"})
+    return save_workbook(wb, path)

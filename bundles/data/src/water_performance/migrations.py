@@ -267,6 +267,24 @@ MIGRATIONS: tuple[Migration, ...] = (
             "UPDATE {silver}.ofwat_wcpr_record SET reporting_area = 'whole_company' WHERE reporting_area IS NULL",
         ),
     ),
+    Migration(
+        5,
+        "Company APR workbook records (same shape as Stream APR records)",
+        (
+            _t(
+                "silver",
+                "company_apr_record",
+                PROVENANCE_COLS
+                + """,
+      company_code_raw STRING, company_code STRING NOT NULL, reporting_area STRING NOT NULL,
+      financial_year_raw STRING, report_year INT NOT NULL, sheet_name STRING, item_reference STRING,
+      line_description STRING, units STRING, decimal_places INT, rag_reference STRING NOT NULL,
+      attribute_raw STRING, attribute STRING, attribute_financial_year INT, value DOUBLE, value_raw STRING,
+      rag_version STRING""",
+                "Company APR workbook values, one row per table cell and source version (cell in record_locator).",
+            ),
+        ),
+    ),
 )
 
 

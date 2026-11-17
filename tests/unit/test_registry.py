@@ -106,6 +106,35 @@ def test_stream_item_register_rules(config_copy):
         registry.load_registry(config_copy)
 
 
-def test_held_items_are_the_unlicensed_ones():
-    held = {i.item_id: i for i in registry.load_registry().stream_items if i.status == "hold"}
-    assert set(held) == {"ccd2a005a25e457caa6b85b929ebe9c3", "0690221de5774c33bab091608c03463a"}
+def test_unlicensed_items_are_held_or_overridden_with_a_reason():
+    items = registry.load_registry().stream_items
+    assert {i.item_id for i in items if i.status == "hold"} == {"0690221de5774c33bab091608c03463a"}
+    overridden = {i.item_id: i.licence_override for i in items if i.licence_override}
+    assert set(overridden) == {"ccd2a005a25e457caa6b85b929ebe9c3"} and all(overridden.values())
+
+
+def test_licence_override_rules(config_copy):
+    path = config_copy / "stream_apr_items.yml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    doc["items"][0]["licence_override"] = " "
+    path.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    with pytest.raises(registry.RegistryError, match="licence_override needs status enabled and a stated reason"):
+        registry.load_registry(config_copy)
+    shutil.copy(registry.CONFIG_DIR / "stream_apr_items.yml", path)
+    sources = config_copy / "sources.yml"
+    doc = yaml.safe_load(sources.read_text(encoding="utf-8"))
+    src = next(s for s in doc["sources"] if s["source_id"] == "OFWAT_PR24_OUTCOMES")
+    src["assets"][0]["licence_verification"] = "operator_override"
+    sources.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    with pytest.raises(registry.RegistryError, match="operator_override assets need licence id NO-OPEN-LICENCE"):
+        registry.load_registry(config_copy)
+
+
+def test_a_licence_without_redistribution_needs_every_asset_overridden(config_copy):
+    sources = config_copy / "sources.yml"
+    doc = yaml.safe_load(sources.read_text(encoding="utf-8"))
+    src = next(s for s in doc["sources"] if s["source_id"] == "COMPANY_APR")
+    src["assets"][0]["licence_verification"] = "in_asset_statement"
+    sources.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    with pytest.raises(registry.RegistryError, match="does not allow redistribution"):
+        registry.load_registry(config_copy)

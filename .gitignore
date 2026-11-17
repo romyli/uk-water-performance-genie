@@ -12,6 +12,8 @@
 /downloads/
 # Governed configuration tables are the only tracked CSV files.
 !bundles/data/src/water_performance/config/*.csv
+# The generated list of source URLs (tools/export_source_urls.py) holds no source data.
+!docs/source-urls.csv
 
 # Personal deployment values (see config.example.yml)
 config.yml

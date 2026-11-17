@@ -56,6 +56,14 @@ SELECT s.source_id, s.company_code, s.reporting_area, s.report_year, p.financial
 FROM {silver}.stream_apr_record s
 JOIN cur ON cur.source_id = s.source_id AND cur.asset_key = s.asset_key AND cur.asset_version = s.asset_version
 JOIN cfg_dim_period p ON p.report_year = s.report_year
+UNION ALL
+SELECT c.source_id, c.company_code, c.reporting_area, c.report_year, p.financial_year, c.item_reference,
+       c.rag_reference, c.line_description, c.attribute, c.attribute_financial_year, c.value, c.units,
+       c.decimal_places, CAST(NULL AS DOUBLE), c.asset_key, c.asset_version, c.sha256, c.release_label,
+       c.record_locator, c.parser_version, c.rag_version
+FROM {silver}.company_apr_record c
+JOIN cur ON cur.source_id = c.source_id AND cur.asset_key = c.asset_key AND cur.asset_version = c.asset_version
+JOIN cfg_dim_period p ON p.report_year = c.report_year
 """
 
 # One row per published value. WCPR releases overlap (each repeats earlier years), so conform keeps the
@@ -233,10 +241,15 @@ WITH used AS (
   UNION SELECT DISTINCT source_id, asset_key, asset_version FROM {silver}.release_fact_odi WHERE release_id = '{release}'
 )
 SELECT '{release}', m.source_id, m.asset_key, m.asset_version, m.release_label,
-       replace(replace(replace(coalesce(s.attribution, ''), '{{company_name}}', coalesce(i.company_name, '')),
-               '{{financial_year}}', coalesce(i.financial_year, '')), '{{release}}', coalesce(m.release_label, '')),
-       m.licence_id, s.licence_name, s.licence_url, m.landing_page, m.asset_url, s.third_party_rights,
-       m.retrieved_at, m.sha256
+       CASE WHEN m.licence_id = s.licence_id
+            THEN replace(replace(replace(coalesce(s.attribution, ''), '{{company_name}}', coalesce(i.company_name, '')),
+                 '{{financial_year}}', coalesce(i.financial_year, '')), '{{release}}', coalesce(m.release_label, ''))
+            ELSE concat('Contains ', coalesce(i.company_name, s.publisher), ' ', coalesce(m.release_label, ''),
+                 ' data from ', s.publisher, '. ', {override_note})
+       END,
+       m.licence_id, CASE WHEN m.licence_id = s.licence_id THEN s.licence_name ELSE {override_name} END,
+       CASE WHEN m.licence_id = s.licence_id THEN s.licence_url END, m.landing_page, m.asset_url,
+       s.third_party_rights, m.retrieved_at, m.sha256
 FROM used u
 JOIN {ops}.asset_manifest m USING (source_id, asset_key, asset_version)
 JOIN cfg_dim_source s ON s.source_id = m.source_id
@@ -254,16 +267,20 @@ SELECT f.company_code, c.company_name, c.service_type, f.company_code = d.compan
        f.original_label, f.attribute, f.attribute_financial_year, f.rag_reference, f.source_item_reference, f.value,
        f.unit, f.price_base,
        m.direction, f.is_comparable, f.comparability_reason, f.is_preferred_source, f.restated,
-       f.previous_release_value, f.source_id, s.publisher, s.licence_id, f.release_label, f.record_locator, f.sha256,
-       f.observation_id
+       f.previous_release_value, f.source_id, s.publisher, coalesce(a.licence_id, s.licence_id) AS licence_id,
+       f.release_label, f.record_locator, f.sha256, f.observation_id
 FROM {gold}.fact_reported_performance f
 JOIN {gold}.dim_company c ON c.company_code = f.company_code
 JOIN {gold}.dim_period p ON p.report_year = f.report_year
 JOIN {gold}.dim_source s ON s.source_id = f.source_id
+LEFT JOIN {gold}.source_attribution a
+  ON a.source_id = f.source_id AND a.asset_key = f.asset_key AND a.asset_version = f.asset_version
 LEFT JOIN {gold}.dim_metric m ON m.metric_id = f.metric_id
 CROSS JOIN {gold}.deployment_context d""",
         "Every published value with company, period, metric definition, comparability and source locator. "
-        "One row per published value; report_year is the financial-year end (2024-25 = 2025).",
+        "One row per published value; report_year is the financial-year end (2024-25 = 2025). "
+        "licence_id is the licence of the value's own source version: NO-OPEN-LICENCE means it was loaded "
+        "by operator decision without an open licence.",
     ),
     "vw_peer_comparison": (
         """
@@ -352,11 +369,15 @@ WITH facts AS (
 )
 SELECT f.fact_type, f.fact_id, f.company_code, f.financial_year, f.metric_id, f.label AS original_label, f.value,
        f.unit, f.source_id, s.publisher, f.release_label, f.record_locator, f.sha256, m.api_item_id,
-       m.asset_url, m.final_url, m.landing_page, m.retrieved_at, m.licence_id, s.licence_name, s.licence_url,
-       m.licence_evidence, s.attribution, m.archive_path, m.byte_size, f.asset_version
+       m.asset_url, m.final_url, m.landing_page, m.retrieved_at, m.licence_id,
+       coalesce(a.licence_name, s.licence_name) AS licence_name, coalesce(a.licence_url, s.licence_url) AS licence_url,
+       m.licence_evidence, coalesce(a.attribution_text, s.attribution) AS attribution, m.archive_path, m.byte_size,
+       f.asset_version
 FROM facts f
 JOIN {ops}.asset_manifest m ON m.source_id = f.source_id AND m.asset_key = f.asset_key AND m.asset_version = f.asset_version
-JOIN {gold}.dim_source s ON s.source_id = f.source_id""",
+JOIN {gold}.dim_source s ON s.source_id = f.source_id
+LEFT JOIN {gold}.source_attribution a
+  ON a.source_id = f.source_id AND a.asset_key = f.asset_key AND a.asset_version = f.asset_version""",
         "Where every Gold number came from: publisher, release, file or API record locator, SHA-256, asset and "
         "landing-page URLs, retrieval time and licence.",
     ),

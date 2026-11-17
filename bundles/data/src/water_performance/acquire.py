@@ -128,7 +128,9 @@ def fetch_stream_item(
         }
         if meta.get("access") != "public":
             return FetchOutcome("STREAM_APR", key, "licence_rejected", "item is not public", base)
-        if lic != "CC-BY-4.0":
+        if lic != "CC-BY-4.0" and item.licence_override:
+            base["licence_override"] = item.licence_override  # the operator loads it without an open licence
+        elif lic != "CC-BY-4.0":
             return FetchOutcome(
                 "STREAM_APR", key, "licence_rejected", f"item licence is not CC BY 4.0: {lic_text[:300]!r}", base
             )
